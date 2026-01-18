@@ -4,511 +4,613 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Medical Study Dashboard</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-  <style>
-   :root{
-  --bg:#070a12;
-  --panel:rgba(14, 18, 34, 0.78);
-  --text:#e7f0ff;
-  --muted:#93a4c7;
-  --border:rgba(120, 160, 255, 0.18);
-  --accent:#7c3aed;       /* neon purple */
-  --accent2:#22c55e;      /* neon green */
-  --accent3:#06b6d4;      /* neon cyan */
-  --shadow:0 10px 30px rgba(0,0,0,.55);
-  --chip:rgba(124,58,237,0.14);
-  --glow:0 0 18px rgba(124,58,237,.35), 0 0 45px rgba(6,182,212,.12);
-}
+  <!-- Futuristic game-friendly font (readable) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
 
-/* Game mode (forced) */
-[data-theme="dark"]{
-  --bg:#070a12;
-  --panel:rgba(14, 18, 34, 0.78);
-  --text:#e7f0ff;
-  --muted:#93a4c7;
-  --border:rgba(120, 160, 255, 0.18);
-  --accent:#7c3aed;
-  --accent2:#22c55e;
-  --accent3:#06b6d4;
-  --shadow:0 10px 30px rgba(0,0,0,.55);
-  --chip:rgba(124,58,237,0.14);
-  --glow:0 0 18px rgba(124,58,237,.35), 0 0 45px rgba(6,182,212,.12);
-}
+  <style>
+    :root{
+      --bg:#070a12;
+      --panel:rgba(14, 18, 34, 0.78);
+      --text:#e7f0ff;
+      --muted:#93a4c7;
+      --border:rgba(120, 160, 255, 0.18);
+      --accent:#7c3aed;       /* neon purple */
+      --accent2:#22c55e;      /* neon green */
+      --accent3:#06b6d4;      /* neon cyan */
+      --shadow:0 10px 30px rgba(0,0,0,.55);
+      --chip:rgba(124,58,237,0.14);
+      --glow:0 0 18px rgba(124,58,237,.35), 0 0 45px rgba(6,182,212,.12);
+      --glow2:0 0 22px rgba(6,182,212,.18), 0 0 70px rgba(124,58,237,.10);
+      --danger:#fb7185;
+    }
+
+    [data-theme="dark"]{
+      --bg:#070a12;
+      --panel:rgba(14, 18, 34, 0.78);
+      --text:#e7f0ff;
+      --muted:#93a4c7;
+      --border:rgba(120, 160, 255, 0.18);
+      --accent:#7c3aed;
+      --accent2:#22c55e;
+      --accent3:#06b6d4;
+      --shadow:0 10px 30px rgba(0,0,0,.55);
+      --chip:rgba(124,58,237,0.14);
+      --glow:0 0 18px rgba(124,58,237,.35), 0 0 45px rgba(6,182,212,.12);
+      --glow2:0 0 22px rgba(6,182,212,.18), 0 0 70px rgba(124,58,237,.10);
+      --danger:#fb7185;
+    }
+
     *{box-sizing:border-box}
-    body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--text)}
+
+    /* Bigger, game-like typography */
+    body{
+      margin:0;
+      font-family: Rajdhani, Inter, system-ui, sans-serif;
+      font-size: 18px;
+      line-height: 1.35;
+      background:var(--bg);
+      color:var(--text);
+      cursor: url('data:image/svg+xml;utf8,\
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">\
+<defs>\
+<filter id="g" x="-50%" y="-50%" width="200%" height="200%">\
+<feDropShadow dx="0" dy="0" stdDeviation="1.8" flood-color="%2306b6d4" flood-opacity="0.8"/>\
+<feDropShadow dx="0" dy="0" stdDeviation="2.8" flood-color="%237c3aed" flood-opacity="0.7"/>\
+</filter>\
+</defs>\
+<g filter="url(%23g)">\
+<path d="M5 2 L27 16 L16 18 L18 29 L14 30 L12 19 L5 2 Z" fill="%23e7f0ff" stroke="%23000000" stroke-width="0.8"/>\
+</g>\
+</svg>') 2 2, auto;
+    }
+
+    /* animated nebula background */
+    body{
+      background:
+        radial-gradient(1200px 800px at 20% 10%, rgba(124,58,237,.20), transparent 55%),
+        radial-gradient(900px 600px at 80% 30%, rgba(6,182,212,.18), transparent 55%),
+        radial-gradient(1200px 900px at 40% 90%, rgba(34,197,94,.12), transparent 60%),
+        linear-gradient(180deg, #050712, #070a12 55%, #050712);
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* scanlines + subtle noise overlay */
+    body:before{
+      content:'';
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      background:
+        repeating-linear-gradient(
+          to bottom,
+          rgba(255,255,255,0.03),
+          rgba(255,255,255,0.03) 1px,
+          transparent 1px,
+          transparent 3px
+        );
+      opacity:.11;
+      mix-blend-mode:overlay;
+      z-index:999;
+    }
+    body:after{
+      content:'';
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      background-image:
+        radial-gradient(rgba(255,255,255,0.08) 1px, transparent 1px);
+      background-size: 3px 3px;
+      opacity:.05;
+      z-index:998;
+    }
+
+    /* floating particles layer */
+    .stars{
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      background:
+        radial-gradient(circle at 10% 20%, rgba(6,182,212,.20), transparent 30%),
+        radial-gradient(circle at 70% 35%, rgba(124,58,237,.22), transparent 28%),
+        radial-gradient(circle at 40% 80%, rgba(34,197,94,.14), transparent 34%);
+      filter: blur(10px);
+      opacity: .75;
+      animation: drift 10s ease-in-out infinite alternate;
+      z-index: 0;
+    }
+    @keyframes drift{
+      from{ transform: translate3d(-10px,-6px,0) scale(1); }
+      to{ transform: translate3d(14px,10px,0) scale(1.03); }
+    }
 
     header{
-      height:56px;display:flex;align-items:center;justify-content:space-between;
-      padding:0 16px;background:var(--panel);border-bottom:1px solid var(--border);
-      font-weight:600;position:sticky;top:0;z-index:10
+      height:64px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:0 16px;
+      background: rgba(10, 14, 28, 0.78);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+      box-shadow: var(--glow);
+      position: sticky;
+      top: 0;
+      z-index: 10;
     }
-    .brand{display:flex;gap:10px;align-items:center}
-    .dot{width:10px;height:10px;border-radius:50%;background:var(--accent)}
+
+    .brand{display:flex;gap:12px;align-items:center;letter-spacing:.4px}
+    .logo{
+      width:34px;height:34px;border-radius:10px;
+      background: linear-gradient(135deg, rgba(124,58,237,.85), rgba(6,182,212,.55));
+      box-shadow: var(--glow2);
+      display:grid;place-items:center;
+      border:1px solid rgba(255,255,255,.10);
+    }
+    .logo svg{width:22px;height:22px;opacity:.95}
+
     .top-actions{display:flex;gap:8px;align-items:center}
     .btn{
-      border:1px solid var(--border);background:var(--panel);color:var(--text);
-      padding:8px 10px;border-radius:10px;cursor:pointer;font-weight:500
+      border:1px solid rgba(120,160,255,0.22);
+      background: rgba(3,6,14,0.35);
+      color:var(--text);
+      padding:10px 12px;
+      border-radius:12px;
+      cursor:pointer;
+      font-weight:600;
+      font-family: inherit;
+      transition: transform .12s ease, box-shadow .12s ease, filter .12s ease;
     }
-    .btn.primary{background:var(--accent);border-color:var(--accent);color:white}
-    .btn.ghost{background:transparent}
+    .btn:hover{transform: translateY(-1px); box-shadow: 0 0 18px rgba(124,58,237,.22)}
+    .btn.primary{
+      background: linear-gradient(90deg, rgba(124,58,237,0.92), rgba(6,182,212,0.68));
+      border-color: rgba(6,182,212,0.35);
+      box-shadow: var(--glow);
+    }
+    .btn.primary:hover{filter: brightness(1.06)}
+    .btn.danger{
+      background: linear-gradient(90deg, rgba(251,113,133,0.85), rgba(124,58,237,0.45));
+      border-color: rgba(251,113,133,0.35);
+      box-shadow: 0 0 18px rgba(251,113,133,.18);
+    }
 
-    .layout{display:grid;grid-template-columns:270px 1fr;min-height:calc(100vh - 56px)}
-    aside{background:var(--panel);border-right:1px solid var(--border);padding:14px;position:sticky;top:56px;height:calc(100vh - 56px);overflow:auto}
-    .navTitle{font-size:12px;text-transform:uppercase;color:var(--muted);margin:6px 0 12px}
+    .layout{display:grid;grid-template-columns:290px 1fr;min-height:calc(100vh - 64px);position:relative;z-index:1}
+
+    aside{
+      background: rgba(10, 14, 28, 0.60);
+      backdrop-filter: blur(12px);
+      border-right:1px solid var(--border);
+      padding:14px;
+      position:sticky;
+      top:64px;
+      height:calc(100vh - 64px);
+      overflow:auto;
+    }
+
+    .navTitle{font-size:13px;text-transform:uppercase;color:var(--muted);margin:8px 0 12px;letter-spacing:1px}
+
     .nav button{
-      width:100%;padding:10px 12px;margin-bottom:8px;border-radius:12px;border:1px solid var(--border);
-      background:transparent;color:var(--text);cursor:pointer;font-weight:500;text-align:left
+      width:100%;
+      padding:12px 12px;
+      margin-bottom:10px;
+      border-radius:14px;
+      border:1px solid rgba(124,58,237,0.18);
+      background: rgba(124,58,237,0.10);
+      cursor:pointer;
+      font-weight:650;
+      font-family: inherit;
+      text-align:left;
+      color: var(--text);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      transition: transform .12s ease, box-shadow .12s ease, background .12s ease;
     }
-    .nav button.active{background:var(--chip);border-color:transparent}
+    .nav button .left{display:flex;align-items:center;gap:10px;min-width:0}
+    .nav button .lbl{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .nav button .icon{width:18px;height:18px;opacity:.9}
+    .nav button:hover{transform: translateY(-1px); box-shadow: var(--glow2); background: rgba(6,182,212,0.10)}
+    .nav button.active{
+      background: linear-gradient(90deg, rgba(124,58,237,0.30), rgba(6,182,212,0.20));
+      border-color: rgba(6,182,212,0.28);
+      box-shadow: var(--glow);
+    }
 
-    main{padding:16px;max-width:1200px;margin:0 auto;width:100%}
+    main{padding:16px;max-width:1250px;margin:0 auto;width:100%}
 
     .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:12px}
-    .card{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:14px;box-shadow:var(--shadow)}
-    .card h2{margin:0 0 8px;font-size:15px}
-    .sub{color:var(--muted);font-size:12px;margin:0 0 10px}
+
+    .card{
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 16px;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+    .card:before{
+      content:'';
+      position:absolute;
+      inset:-2px;
+      border-radius: 20px;
+      padding: 1px;
+      background: linear-gradient(120deg, rgba(124,58,237,.55), rgba(6,182,212,.30), rgba(34,197,94,.18));
+      -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      opacity: .55;
+      pointer-events:none;
+    }
+
+    h2{margin:0 0 10px;font-size:18px;letter-spacing:.3px}
+    .sub{color:var(--muted);font-size:14px;margin:0 0 12px}
 
     input,textarea,select{
-      width:100%;padding:10px;border-radius:12px;border:1px solid var(--border);
-      background:transparent;color:var(--text);font-family:inherit
+      width:100%;
+      padding:12px;
+      border-radius:14px;
+      border: 1px solid rgba(120,160,255,0.22);
+      background: rgba(3,6,14,0.35);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 17px;
     }
     textarea{resize:vertical}
+
+    input:focus, textarea:focus, select:focus{
+      outline:none;
+      border-color: rgba(6,182,212,0.58);
+      box-shadow: 0 0 0 4px rgba(6,182,212,0.12), 0 0 18px rgba(124,58,237,.20);
+    }
 
     .row{display:flex;gap:10px;flex-wrap:wrap}
     .row > *{flex:1}
 
+    .chip{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 12px;
+      border-radius:999px;
+      background: rgba(124,58,237,0.14);
+      border:1px solid rgba(124,58,237,0.20);
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .swatch{width:12px;height:12px;border-radius:999px;background:#94a3b8;box-shadow: 0 0 12px rgba(255,255,255,.08)}
+
     ul{list-style:none;padding:0;margin:0}
-    li{padding:10px 0;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px}
+    li{
+      padding:12px 10px;
+      border-bottom: 1px solid rgba(120,160,255,0.10);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      border-radius:14px;
+      transition: background .12s ease, box-shadow .12s ease;
+    }
+    li:hover{
+      background: rgba(6,182,212,0.07);
+      box-shadow: inset 0 0 0 1px rgba(6,182,212,0.12);
+    }
+
     .li-left{display:flex;align-items:center;gap:10px;min-width:0}
     .li-title{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
-    .chip{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:var(--chip);font-size:12px;color:var(--text)}
-    .swatch{width:10px;height:10px;border-radius:999px;background:#94a3b8}
-
     .kpi{display:flex;gap:10px;flex-wrap:wrap}
-    .kpi .chip{background:transparent;border:1px solid var(--border)}
 
-    .timer{font-size:38px;text-align:center;margin:12px 0 8px;font-weight:600;letter-spacing:1px}
-    .timerMeta{display:flex;justify-content:space-between;color:var(--muted);font-size:12px}
+    .timer{font-size:44px;text-align:center;margin:12px 0 8px;font-weight:700;letter-spacing:1px;text-shadow: 0 0 18px rgba(6,182,212,.10)}
+    .timerMeta{display:flex;justify-content:space-between;color:var(--muted);font-size:14px}
 
     .heatmap{display:grid;grid-template-columns:repeat(14, 1fr);gap:6px}
-    .cell{height:16px;border-radius:4px;border:1px solid var(--border);background:transparent}
+    .cell{height:18px;border-radius:6px;border:1px solid rgba(120,160,255,0.12);background:transparent}
 
     .week{display:grid;grid-template-columns:repeat(7,1fr);gap:8px}
-    .dayBox{border:1px solid var(--border);border-radius:12px;padding:10px}
-    .dayBox h4{margin:0 0 8px;font-size:12px;color:var(--muted);text-transform:uppercase}
+    .dayBox{border:1px solid rgba(120,160,255,0.16);border-radius:14px;padding:10px;background: rgba(3,6,14,0.18)}
+    .dayBox h4{margin:0 0 8px;font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
 
-    canvas{width:100%;height:180px;border-radius:12px;border:1px solid var(--border);background:transparent}
+    canvas{width:100%;height:190px;border-radius:14px;border:1px solid rgba(120,160,255,0.18);background: rgba(3,6,14,0.18);box-shadow: 0 0 20px rgba(6,182,212,0.10)}
 
-    .small{font-size:12px;color:var(--muted)}
+    .small{font-size:14px;color:var(--muted)}
 
-    /* Mobile-first improvements */
+    /* breathing glow animation */
+    @keyframes breathe{
+      0%{ box-shadow: var(--shadow); }
+      100%{ box-shadow: var(--shadow), var(--glow2); }
+    }
+    .card{ animation: breathe 3.2s ease-in-out infinite alternate; }
+
+    /* Mobile */
     @media (max-width: 980px){
+      body{font-size: 17px;}
       .layout{grid-template-columns:1fr}
       aside{position:relative;top:0;height:auto;border-right:none;border-bottom:1px solid var(--border)}
       main{padding:12px}
     }
-    /* ===== Game / HUD Look ===== */
-
-body{
-  background:
-    radial-gradient(1200px 800px at 20% 10%, rgba(124,58,237,.18), transparent 55%),
-    radial-gradient(900px 600px at 80% 30%, rgba(6,182,212,.14), transparent 55%),
-    radial-gradient(1200px 900px at 40% 90%, rgba(34,197,94,.10), transparent 60%),
-    linear-gradient(180deg, #050712, #070a12 55%, #050712);
-}
-
-/* subtle scanlines + noise overlay */
-body:before{
-  content:'';
-  position:fixed;
-  inset:0;
-  pointer-events:none;
-  background:
-    repeating-linear-gradient(
-      to bottom,
-      rgba(255,255,255,0.03),
-      rgba(255,255,255,0.03) 1px,
-      transparent 1px,
-      transparent 3px
-    );
-  opacity:.10;
-  mix-blend-mode:overlay;
-  z-index:999;
-}
-body:after{
-  content:'';
-  position:fixed;
-  inset:0;
-  pointer-events:none;
-  background-image:
-    radial-gradient(rgba(255,255,255,0.08) 1px, transparent 1px);
-  background-size: 3px 3px;
-  opacity:.05;
-  z-index:998;
-}
-
-/* header = neon HUD bar */
-header{
-  background: rgba(10, 14, 28, 0.78);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid var(--border);
-  box-shadow: var(--glow);
-}
-
-/* left nav feels like a game menu */
-aside{
-  background: rgba(10, 14, 28, 0.60);
-  backdrop-filter: blur(12px);
-}
-.nav button{
-  background: rgba(124,58,237,0.10);
-  border: 1px solid rgba(124,58,237,0.18);
-  box-shadow: 0 0 0 rgba(0,0,0,0);
-  transition: transform .12s ease, box-shadow .12s ease, background .12s ease;
-}
-.nav button:hover{
-  transform: translateY(-1px);
-  box-shadow: 0 0 18px rgba(124,58,237,.22);
-  background: rgba(6,182,212,0.10);
-}
-.nav button.active{
-  background: linear-gradient(90deg, rgba(124,58,237,0.24), rgba(6,182,212,0.18));
-  border-color: rgba(6,182,212,0.28);
-  box-shadow: var(--glow);
-}
-
-/* cards become glassy panels */
-.card{
-  background: var(--panel);
-  border: 1px solid var(--border);
-  backdrop-filter: blur(12px);
-  box-shadow: var(--shadow);
-  position: relative;
-  overflow: hidden;
-}
-.card:before{
-  content:'';
-  position:absolute;
-  inset:-2px;
-  border-radius: 18px;
-  padding: 1px;
-  background: linear-gradient(120deg, rgba(124,58,237,.45), rgba(6,182,212,.25), rgba(34,197,94,.18));
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  opacity: .45;
-  pointer-events:none;
-}
-
-/* inputs become futuristic */
-input, textarea, select{
-  background: rgba(3,6,14,0.35);
-  border: 1px solid rgba(120,160,255,0.22);
-  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.15);
-}
-input:focus, textarea:focus, select:focus{
-  outline: none;
-  border-color: rgba(6,182,212,0.55);
-  box-shadow: 0 0 0 3px rgba(6,182,212,0.12), 0 0 18px rgba(124,58,237,.20);
-}
-
-/* buttons = neon game buttons */
-.btn{
-  background: rgba(3,6,14,0.35);
-  border: 1px solid rgba(120,160,255,0.22);
-}
-.btn.primary{
-  background: linear-gradient(90deg, rgba(124,58,237,0.9), rgba(6,182,212,0.65));
-  border-color: rgba(6,182,212,0.35);
-  box-shadow: var(--glow);
-}
-.btn.primary:hover{
-  filter: brightness(1.05);
-}
-
-/* chips feel like status badges */
-.chip{
-  background: rgba(124,58,237,0.14);
-  border: 1px solid rgba(124,58,237,0.20);
-}
-
-/* list items hover like selectable game items */
-li{
-  border-bottom: 1px solid rgba(120,160,255,0.10);
-}
-li:hover{
-  background: rgba(6,182,212,0.07);
-  box-shadow: inset 0 0 0 1px rgba(6,182,212,0.12);
-  border-radius: 12px;
-  padding-left: 10px;
-  padding-right: 10px;
-}
-
-/* charts border + glow */
-canvas{
-  border: 1px solid rgba(120,160,255,0.18);
-  box-shadow: 0 0 20px rgba(6,182,212,0.10);
-}
   </style>
 </head>
 <body>
-<header>
-  <div class="brand"><span class="dot"></span>Medical Study Dashboard</div>
-  <div class="top-actions">
-    <button class="btn" id="themeBtn" title="Toggle dark mode">🌙</button>
-    <button class="btn" id="exportBtn" title="Export data">Export</button>
-    <button class="btn" id="importBtn" title="Import data">Import</button>
-  </div>
-</header>
+  <div class="stars"></div>
 
-<div class="layout">
-  <aside>
-    <div class="navTitle">Navigation</div>
-    <div class="nav">
-      <button data-view="overview" class="active">Overview</button>
-      <button data-view="calendar">Calendar</button>
-      <button data-view="weekly">Weekly Planner</button>
-      <button data-view="tasks">Tasks</button>
-      <button data-view="study">Study Tracker</button>
-      <button data-view="pomodoro">Pomodoro</button>
-      <button data-view="osce">OSCE Checklist</button>
-      <button data-view="sba">SBA Counter</button>
-      <button data-view="anki">Anki / Question Sessions</button>
-      <button data-view="research">Research / SFP Tracker</button>
-      <button data-view="analytics">Analytics</button>
-      <button data-view="settings">Settings</button>
+  <header>
+    <div class="brand">
+      <div class="logo" title="Medical Study Dashboard">
+        <!-- simple game-like emblem -->
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2l7 4v7c0 5-4 8-7 9-3-1-7-4-7-9V6l7-4Z" stroke="rgba(255,255,255,0.92)" stroke-width="1.6"/>
+          <path d="M12 7v10" stroke="rgba(255,255,255,0.92)" stroke-width="1.6" stroke-linecap="round"/>
+          <path d="M7 12h10" stroke="rgba(255,255,255,0.92)" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div>
+        <div style="font-weight:700;font-size:20px;letter-spacing:.6px">Medical Study Dashboard</div>
+        <div class="small" style="margin-top:-2px">Game-mode planner • OSCE • SBAs • Analytics</div>
+      </div>
     </div>
-    <div style="margin-top:14px" class="small">
-      Tip: click an item in a list to delete/complete it.
+
+    <div class="top-actions">
+      <button class="btn" id="themeBtn" title="Toggle mode">☀️</button>
+      <button class="btn" id="exportBtn" title="Export data">⬇ Export</button>
+      <button class="btn" id="importBtn" title="Import data">⬆ Import</button>
     </div>
-  </aside>
+  </header>
 
-  <main>
-    <!-- OVERVIEW -->
-    <section id="overview" class="grid">
-      <div class="card" style="grid-column: span 6;">
-        <h2>Today's Plan</h2>
-        <p class="sub">Ward round / teaching / revision focus.</p>
-        <textarea id="plan" rows="7" placeholder="e.g. Renal ward round + AKI NICE pathway + 40 SBAs"></textarea>
+  <div class="layout">
+    <aside>
+      <div class="navTitle">Navigation</div>
+      <div class="nav">
+        <button data-view="overview" class="active"><span class="left"><span class="icon">🏠</span><span class="lbl">Overview</span></span><span>›</span></button>
+        <button data-view="calendar"><span class="left"><span class="icon">🗓️</span><span class="lbl">Calendar</span></span><span>›</span></button>
+        <button data-view="weekly"><span class="left"><span class="icon">🧭</span><span class="lbl">Weekly Planner</span></span><span>›</span></button>
+        <button data-view="tasks"><span class="left"><span class="icon">✅</span><span class="lbl">Tasks</span></span><span>›</span></button>
+        <button data-view="study"><span class="left"><span class="icon">📚</span><span class="lbl">Study Tracker</span></span><span>›</span></button>
+        <button data-view="pomodoro"><span class="left"><span class="icon">⏱️</span><span class="lbl">Pomodoro</span></span><span>›</span></button>
+        <button data-view="osce"><span class="left"><span class="icon">🩺</span><span class="lbl">OSCE Checklist</span></span><span>›</span></button>
+        <button data-view="sba"><span class="left"><span class="icon">🧩</span><span class="lbl">SBA Counter</span></span><span>›</span></button>
+        <button data-view="anki"><span class="left"><span class="icon">🧠</span><span class="lbl">Anki / Sessions</span></span><span>›</span></button>
+        <button data-view="research"><span class="left"><span class="icon">🧪</span><span class="lbl">Research / SFP</span></span><span>›</span></button>
+        <button data-view="analytics"><span class="left"><span class="icon">📈</span><span class="lbl">Analytics</span></span><span>›</span></button>
+        <button data-view="settings"><span class="left"><span class="icon">⚙️</span><span class="lbl">Settings</span></span><span>›</span></button>
       </div>
+      <div style="margin-top:14px" class="small">
+        Tip: click list items to remove/complete. Double-click OSCE item to delete.
+      </div>
+    </aside>
 
-      <div class="card" style="grid-column: span 6;">
-        <h2>Exam Countdown</h2>
-        <p class="sub">Set your target exam date; it appears on the dashboard.</p>
-        <div class="row">
-          <input type="date" id="examDate" />
-          <input id="examName" placeholder="Exam name (e.g. Finals / AKT / SJT)" />
+    <main>
+      <!-- OVERVIEW -->
+      <section id="overview" class="grid">
+        <div class="card" style="grid-column: span 6;">
+          <h2>🧾 Today's Plan</h2>
+          <p class="sub">Ward round / teaching / revision focus.</p>
+          <textarea id="plan" rows="7" placeholder="e.g. Renal ward round + AKI NICE pathway + 40 SBAs"></textarea>
+          <div style="margin-top:10px" class="row">
+            <span class="chip" id="todayChip"></span>
+            <span class="chip" id="countdownChip">Set an exam date →</span>
+          </div>
         </div>
-        <div class="kpi" style="margin-top:10px">
-          <span class="chip" id="countdownChip">Set an exam date →</span>
-          <span class="chip" id="todayChip"></span>
+
+        <div class="card" style="grid-column: span 6;">
+          <h2>🎯 Exam Countdown</h2>
+          <p class="sub">Set your target exam date.</p>
+          <div class="row">
+            <input type="date" id="examDate" />
+            <input id="examName" placeholder="Exam name (e.g. Finals / AKT / SJT)" />
+          </div>
+          <div class="row" style="margin-top:12px">
+            <div class="chip"><span class="swatch" style="background:var(--accent3)"></span>Daily focus → analytics</div>
+            <div class="chip"><span class="swatch" style="background:var(--accent2)"></span>Topics → XP vibe</div>
+          </div>
         </div>
-      </div>
 
-      <div class="card" style="grid-column: span 7;">
-        <h2>Subjects</h2>
-        <p class="sub">Colour-coded tags for tasks & study entries.</p>
-        <div class="row">
-          <input id="subjectName" placeholder="Add subject (e.g. Nephrology)" />
-          <input id="subjectColor" type="color" value="#4f46e5" />
-          <button class="btn primary" id="addSubject">Add</button>
+        <div class="card" style="grid-column: span 7;">
+          <h2>🧷 Subjects</h2>
+          <p class="sub">Colour-coded tags for tasks & study entries.</p>
+          <div class="row">
+            <input id="subjectName" placeholder="Add subject (e.g. Nephrology)" />
+            <input id="subjectColor" type="color" value="#7c3aed" />
+            <button class="btn primary" id="addSubject">＋ Add</button>
+          </div>
+          <div id="subjectChips" style="margin-top:12px" class="row"></div>
         </div>
-        <div id="subjectChips" style="margin-top:10px" class="row"></div>
-      </div>
 
-      <div class="card" style="grid-column: span 5;">
-        <h2>Weekly Heatmap</h2>
-        <p class="sub">Study intensity over the last 28 days (topics + focus minutes).</p>
-        <div class="heatmap" id="heatmap"></div>
-        <div class="timerMeta" style="margin-top:10px"><span id="hmLegendL">Less</span><span id="hmLegendR">More</span></div>
-      </div>
+        <div class="card" style="grid-column: span 5;">
+          <h2>🟪 Activity Heatmap</h2>
+          <p class="sub">Last 28 days intensity.</p>
+          <div class="heatmap" id="heatmap"></div>
+          <div class="timerMeta" style="margin-top:10px"><span>Less</span><span>More</span></div>
+        </div>
 
-      <div class="card" style="grid-column: span 12;">
-        <h2>Quick Add</h2>
-        <p class="sub">Log something fast without switching tabs.</p>
+        <div class="card" style="grid-column: span 12;">
+          <h2>⚡ Quick Add</h2>
+          <p class="sub">Log something fast without switching tabs.</p>
+          <div class="row">
+            <input id="quickTask" placeholder="Task (e.g. Review renal biopsy patterns)" />
+            <select id="quickSubject"></select>
+            <button class="btn primary" id="quickAddTask">Add Task</button>
+          </div>
+          <div class="row" style="margin-top:10px">
+            <input id="quickStudy" placeholder="Completed topic (e.g. Nephrotic syndrome DDx)" />
+            <select id="quickStudySubject"></select>
+            <button class="btn primary" id="quickAddStudy">Log Topic</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- CALENDAR -->
+      <section id="calendar" class="card" style="display:none">
+        <h2>🗓️ Calendar</h2>
+        <p class="sub">Pick a date for daily notes.</p>
         <div class="row">
-          <input id="quickTask" placeholder="Task (e.g. Review renal biopsy patterns)" />
-          <select id="quickSubject"></select>
-          <button class="btn primary" id="quickAddTask">Add Task</button>
+          <input type="date" id="datePicker" />
+          <button class="btn" id="jumpToday">Jump to today</button>
+        </div>
+        <textarea id="dayNotes" rows="10" placeholder="Notes for selected day"></textarea>
+      </section>
+
+      <!-- WEEKLY -->
+      <section id="weekly" class="card" style="display:none">
+        <h2>🧭 Weekly Planner</h2>
+        <p class="sub">Plan your week (Mon–Sun). Stored per ISO week.</p>
+        <div class="week" id="weekGrid"></div>
+      </section>
+
+      <!-- TASKS -->
+      <section id="tasks" class="card" style="display:none">
+        <h2>✅ Tasks</h2>
+        <p class="sub">Enter to add. Click a task to remove/complete.</p>
+        <div class="row">
+          <input id="taskInput" placeholder="Add task (e.g. Renal OSCE practice)" />
+          <select id="taskSubject"></select>
+          <input id="taskDue" type="date" />
+        </div>
+        <ul id="taskList" style="margin-top:10px"></ul>
+      </section>
+
+      <!-- STUDY -->
+      <section id="study" class="card" style="display:none">
+        <h2>📚 Study Tracker</h2>
+        <p class="sub">Log completed topics with subject tags.</p>
+        <div class="row">
+          <input id="studyInput" placeholder="Completed topic" />
+          <select id="studySubject"></select>
+        </div>
+        <ul id="studyList" style="margin-top:10px"></ul>
+      </section>
+
+      <!-- POMODORO -->
+      <section id="pomodoro" class="card" style="display:none">
+        <h2>⏱️ Pomodoro</h2>
+        <p class="sub">Focus cycles + breaks. Logs minutes to analytics automatically.</p>
+        <div class="timer" id="timer">25:00</div>
+        <div class="timerMeta"><span id="sessionLabel">Focus</span><span id="cycleLabel">Cycle 1/4</span></div>
+        <div class="row" style="margin-top:12px">
+          <button class="btn primary" id="startP">Start</button>
+          <button class="btn" id="pauseP">Pause</button>
+          <button class="btn" id="resetP">Reset</button>
+        </div>
+        <div class="row" style="margin-top:12px">
+          <input id="focusMin" type="number" min="10" max="90" value="25" />
+          <input id="breakMin" type="number" min="3" max="30" value="5" />
+          <input id="longBreakMin" type="number" min="10" max="60" value="15" />
+        </div>
+        <p class="small" style="margin-top:10px">Default: 25/5 with a long break after 4 focus blocks.</p>
+      </section>
+
+      <!-- OSCE -->
+      <section id="osce" class="card" style="display:none">
+        <h2>🩺 OSCE Checklist</h2>
+        <p class="sub">Make station checklists (e.g., Resp exam, Neuro exam, Derm history).</p>
+        <div class="row">
+          <input id="osceStation" placeholder="Station name (e.g. Cranial nerve exam)" />
+          <button class="btn primary" id="createStation">Create station</button>
         </div>
         <div class="row" style="margin-top:10px">
-          <input id="quickStudy" placeholder="Completed topic (e.g. Nephrotic syndrome DDx)" />
-          <select id="quickStudySubject"></select>
-          <button class="btn primary" id="quickAddStudy">Log Topic</button>
+          <select id="osceSelect"></select>
+          <input id="osceItem" placeholder="Add checklist item (e.g. Inspect for scars)" />
         </div>
-      </div>
-    </section>
+        <ul id="osceList" style="margin-top:10px"></ul>
+        <p class="small" style="margin-top:8px">Click an item to toggle done. Double-click to delete.</p>
+      </section>
 
-    <!-- CALENDAR -->
-    <section id="calendar" class="card" style="display:none">
-      <h2>Calendar</h2>
-      <p class="sub">Pick a date for daily notes.</p>
-      <div class="row">
-        <input type="date" id="datePicker" />
-        <button class="btn" id="jumpToday">Jump to today</button>
-      </div>
-      <textarea id="dayNotes" rows="10" placeholder="Notes for selected day"></textarea>
-    </section>
-
-    <!-- WEEKLY -->
-    <section id="weekly" class="card" style="display:none">
-      <h2>Weekly Planner</h2>
-      <p class="sub">Plan your week (Mon–Sun). Stored per ISO week.</p>
-      <div class="week" id="weekGrid"></div>
-    </section>
-
-    <!-- TASKS -->
-    <section id="tasks" class="card" style="display:none">
-      <h2>Tasks</h2>
-      <p class="sub">Enter to add. Click a task to remove/complete.</p>
-      <div class="row">
-        <input id="taskInput" placeholder="Add task (e.g. Renal OSCE practice)" />
-        <select id="taskSubject"></select>
-        <input id="taskDue" type="date" />
-      </div>
-      <ul id="taskList" style="margin-top:10px"></ul>
-    </section>
-
-    <!-- STUDY -->
-    <section id="study" class="card" style="display:none">
-      <h2>Study Tracker</h2>
-      <p class="sub">Log completed topics with subject tags.</p>
-      <div class="row">
-        <input id="studyInput" placeholder="Completed topic" />
-        <select id="studySubject"></select>
-      </div>
-      <ul id="studyList" style="margin-top:10px"></ul>
-    </section>
-
-    <!-- POMODORO -->
-    <section id="pomodoro" class="card" style="display:none">
-      <h2>Pomodoro</h2>
-      <p class="sub">Focus cycles + breaks. Logs minutes to analytics automatically.</p>
-      <div class="timer" id="timer">25:00</div>
-      <div class="timerMeta"><span id="sessionLabel">Focus</span><span id="cycleLabel">Cycle 1/4</span></div>
-      <div class="row" style="margin-top:12px">
-        <button class="btn primary" id="startP">Start</button>
-        <button class="btn" id="pauseP">Pause</button>
-        <button class="btn" id="resetP">Reset</button>
-      </div>
-      <div class="row" style="margin-top:12px">
-        <input id="focusMin" type="number" min="10" max="90" value="25" />
-        <input id="breakMin" type="number" min="3" max="30" value="5" />
-        <input id="longBreakMin" type="number" min="10" max="60" value="15" />
-      </div>
-      <p class="small" style="margin-top:10px">Default: 25/5 with a long break after 4 focus blocks.</p>
-    </section>
-
-    <!-- OSCE -->
-    <section id="osce" class="card" style="display:none">
-      <h2>OSCE Checklist</h2>
-      <p class="sub">Make station checklists (e.g., Resp exam, Neuro exam, Derm history).</p>
-      <div class="row">
-        <input id="osceStation" placeholder="Station name (e.g. Cranial nerve exam)" />
-        <button class="btn primary" id="createStation">Create station</button>
-      </div>
-      <div class="row" style="margin-top:10px">
-        <select id="osceSelect"></select>
-        <input id="osceItem" placeholder="Add checklist item (e.g. Inspect for scars)" />
-      </div>
-      <ul id="osceList" style="margin-top:10px"></ul>
-      <p class="small" style="margin-top:8px">Click an item to toggle done. Double-click to delete.</p>
-    </section>
-
-    <!-- SBA -->
-    <section id="sba" class="card" style="display:none">
-      <h2>SBA Counter</h2>
-      <p class="sub">Track questions done per day and per subject.</p>
-      <div class="row">
-        <input id="sbaCount" type="number" min="1" placeholder="How many SBAs now?" />
-        <select id="sbaSubject"></select>
-        <button class="btn primary" id="logSba">Log</button>
-      </div>
-      <div class="kpi" style="margin-top:10px">
-        <span class="chip" id="sbaToday">Today: 0</span>
-        <span class="chip" id="sbaWeek">This week: 0</span>
-      </div>
-      <ul id="sbaLog" style="margin-top:10px"></ul>
-    </section>
-
-    <!-- ANKI -->
-    <section id="anki" class="card" style="display:none">
-      <h2>Anki / Question Sessions</h2>
-      <p class="sub">Log revision sessions (minutes + what you used). Feeds analytics.</p>
-      <div class="row">
-        <select id="ankiType">
-          <option value="Anki">Anki</option>
-          <option value="Passmedicine">Passmedicine</option>
-          <option value="Qbank">Qbank</option>
-          <option value="Notes">Notes</option>
-        </select>
-        <input id="ankiMinutes" type="number" min="5" placeholder="Minutes" />
-        <select id="ankiSubject"></select>
-      </div>
-      <input id="ankiNote" placeholder="Optional note (e.g. AKI guidelines + diuretics)" />
-      <button class="btn primary" id="logAnki" style="margin-top:10px">Log Session</button>
-      <ul id="ankiLog" style="margin-top:10px"></ul>
-    </section>
-
-    <!-- RESEARCH -->
-    <section id="research" class="card" style="display:none">
-      <h2>Research / SFP Tracker</h2>
-      <p class="sub">Track projects, actions, and deadlines.</p>
-      <div class="row">
-        <input id="projName" placeholder="Project (e.g. AI melanoma audit / CRISPR derm review)" />
-        <input id="projDue" type="date" />
-      </div>
-      <input id="projNext" placeholder="Next action (e.g. Extract data, draft abstract)" />
-      <button class="btn primary" id="addProject" style="margin-top:10px">Add Project</button>
-      <ul id="projList" style="margin-top:10px"></ul>
-    </section>
-
-    <!-- ANALYTICS -->
-    <section id="analytics" class="grid" style="display:none">
-      <div class="card" style="grid-column: span 6;">
-        <h2>Focus Minutes (last 7 days)</h2>
-        <p class="sub">Includes Pomodoro + logged sessions.</p>
-        <canvas id="focusChart" width="800" height="220"></canvas>
-      </div>
-      <div class="card" style="grid-column: span 6;">
-        <h2>Topics Completed (last 7 days)</h2>
-        <p class="sub">From Study Tracker entries.</p>
-        <canvas id="topicChart" width="800" height="220"></canvas>
-      </div>
-      <div class="card" style="grid-column: span 12;">
-        <h2>Quick Summary</h2>
-        <div class="kpi">
-          <span class="chip" id="sumFocus">Focus today: 0 min</span>
-          <span class="chip" id="sumTopics">Topics today: 0</span>
-          <span class="chip" id="sumSba">SBAs today: 0</span>
+      <!-- SBA -->
+      <section id="sba" class="card" style="display:none">
+        <h2>🧩 SBA Counter</h2>
+        <p class="sub">Track questions done per day and per subject.</p>
+        <div class="row">
+          <input id="sbaCount" type="number" min="1" placeholder="How many SBAs now?" />
+          <select id="sbaSubject"></select>
+          <button class="btn primary" id="logSba">Log</button>
         </div>
-        <p class="small" style="margin-top:10px">Everything is stored locally in your browser. Use Export/Import to sync across devices.</p>
-      </div>
-    </section>
+        <div class="kpi" style="margin-top:10px">
+          <span class="chip" id="sbaToday">Today: 0</span>
+          <span class="chip" id="sbaWeek">This week: 0</span>
+        </div>
+        <ul id="sbaLog" style="margin-top:10px"></ul>
+      </section>
 
-    <!-- SETTINGS -->
-    <section id="settings" class="card" style="display:none">
-      <h2>Settings</h2>
-      <p class="sub">Basic configuration for your dashboard.</p>
-      <div class="row">
-        <button class="btn" id="resetToday">Clear today only</button>
-        <button class="btn" id="resetAll">Clear all data</button>
-      </div>
-      <p class="small" style="margin-top:10px">Clearing all data removes everything stored in your browser for this site.</p>
-    </section>
+      <!-- ANKI -->
+      <section id="anki" class="card" style="display:none">
+        <h2>🧠 Anki / Question Sessions</h2>
+        <p class="sub">Log revision sessions (minutes + what you used). Feeds analytics.</p>
+        <div class="row">
+          <select id="ankiType">
+            <option value="Anki">Anki</option>
+            <option value="Passmedicine">Passmedicine</option>
+            <option value="Qbank">Qbank</option>
+            <option value="Notes">Notes</option>
+          </select>
+          <input id="ankiMinutes" type="number" min="5" placeholder="Minutes" />
+          <select id="ankiSubject"></select>
+        </div>
+        <input id="ankiNote" placeholder="Optional note (e.g. AKI guidelines + diuretics)" />
+        <button class="btn primary" id="logAnki" style="margin-top:10px">Log Session</button>
+        <ul id="ankiLog" style="margin-top:10px"></ul>
+      </section>
 
-  </main>
-</div>
+      <!-- RESEARCH -->
+      <section id="research" class="card" style="display:none">
+        <h2>🧪 Research / SFP Tracker</h2>
+        <p class="sub">Track projects, actions, and deadlines.</p>
+        <div class="row">
+          <input id="projName" placeholder="Project (e.g. AI melanoma audit / CRISPR derm review)" />
+          <input id="projDue" type="date" />
+        </div>
+        <input id="projNext" placeholder="Next action (e.g. Extract data, draft abstract)" />
+        <button class="btn primary" id="addProject" style="margin-top:10px">Add Project</button>
+        <ul id="projList" style="margin-top:10px"></ul>
+      </section>
+
+      <!-- ANALYTICS -->
+      <section id="analytics" class="grid" style="display:none">
+        <div class="card" style="grid-column: span 6;">
+          <h2>📈 Focus Minutes (last 7 days)</h2>
+          <p class="sub">Includes Pomodoro + logged sessions.</p>
+          <canvas id="focusChart" width="800" height="220"></canvas>
+        </div>
+        <div class="card" style="grid-column: span 6;">
+          <h2>✨ Topics Completed (last 7 days)</h2>
+          <p class="sub">From Study Tracker entries.</p>
+          <canvas id="topicChart" width="800" height="220"></canvas>
+        </div>
+        <div class="card" style="grid-column: span 12;">
+          <h2>🧾 Quick Summary</h2>
+          <div class="kpi">
+            <span class="chip" id="sumFocus">Focus today: 0 min</span>
+            <span class="chip" id="sumTopics">Topics today: 0</span>
+            <span class="chip" id="sumSba">SBAs today: 0</span>
+          </div>
+          <p class="small" style="margin-top:10px">Everything is stored locally in your browser. Use Export/Import to sync across devices.</p>
+        </div>
+      </section>
+
+      <!-- SETTINGS -->
+      <section id="settings" class="card" style="display:none">
+        <h2>⚙️ Settings</h2>
+        <p class="sub">Reset or manage your local data.</p>
+        <div class="row">
+          <button class="btn danger" id="resetToday">Clear today only</button>
+          <button class="btn danger" id="resetAll">Clear all data</button>
+        </div>
+        <p class="small" style="margin-top:10px">Clearing all data removes everything stored in your browser for this site.</p>
+      </section>
+
+    </main>
+  </div>
 
 <script>
   /* ------------------------- Storage helpers ------------------------- */
-  const LS_KEY = 'msd.v1';
+  const LS_KEY = 'msd.v2';
   const todayISO = new Date().toISOString().slice(0,10);
 
   function defaultState(){
     return {
-      meta:{ theme:'light' },
+      meta:{ theme:'dark' },
       subjects:[
         {name:'Nephrology', color:'#2563eb'},
         {name:'Dermatology', color:'#ec4899'},
@@ -518,14 +620,14 @@ canvas{
       exam:{ name:'', date:'' },
       planByDate:{},
       notesByDate:{},
-      weekly:{}, // weekKey -> {Mon:'', ...}
-      tasksByDate:{}, // date -> [{t, subject, due}]
-      topicsByDate:{}, // date -> [{t, subject}]
-      focusMinutesByDate:{}, // date -> number
-      sbaByDate:{}, // date -> [{n, subject, ts}]
-      sessionsByDate:{}, // date -> [{type, minutes, subject, note, ts}]
-      osce:{ stations:{}, order:[] }, // name -> [{text, done}]
-      projects:[] // [{name, due, next, created}]
+      weekly:{},
+      tasksByDate:{},
+      topicsByDate:{},
+      focusMinutesByDate:{},
+      sbaByDate:{},
+      sessionsByDate:{},
+      osce:{ stations:{}, order:[] },
+      projects:[]
     };
   }
 
@@ -540,9 +642,7 @@ canvas{
 
   let state = loadState();
 
-  function saveState(){
-    localStorage.setItem(LS_KEY, JSON.stringify(state));
-  }
+  function saveState(){ localStorage.setItem(LS_KEY, JSON.stringify(state)); }
 
   function ensureDateBuckets(date){
     state.planByDate[date] ??= '';
@@ -563,7 +663,7 @@ canvas{
     themeBtn.textContent = state.meta.theme === 'dark' ? '☀️' : '🌙';
   }
   themeBtn.onclick = () => {
-    state.meta.theme = state.meta.theme === 'dark' ? 'dark' : 'dark';
+    state.meta.theme = state.meta.theme === 'dark' ? 'light' : 'dark';
     saveState();
     applyTheme();
     drawAll();
@@ -588,8 +688,7 @@ canvas{
   plan.value = state.planByDate[todayISO] || '';
   plan.oninput = () => { state.planByDate[todayISO] = plan.value; saveState(); };
 
-  const todayChip = document.getElementById('todayChip');
-  todayChip.textContent = `Today: ${todayISO}`;
+  document.getElementById('todayChip').textContent = `Today: ${todayISO}`;
 
   const examDate = document.getElementById('examDate');
   const examName = document.getElementById('examName');
@@ -606,10 +705,7 @@ canvas{
 
   function updateCountdown(){
     const chip = document.getElementById('countdownChip');
-    if(!state.exam.date){
-      chip.textContent = 'Set an exam date →';
-      return;
-    }
+    if(!state.exam.date){ chip.textContent = 'Set an exam date →'; return; }
     const d = daysBetween(todayISO, state.exam.date);
     const name = state.exam.name?.trim() ? state.exam.name.trim()+': ' : '';
     chip.textContent = d >= 0 ? `${name}${d} days to go` : `${name}${Math.abs(d)} days since`;
@@ -678,28 +774,23 @@ canvas{
   datePicker.value = todayISO;
   dayNotes.value = state.notesByDate[todayISO] || '';
 
-  function loadDay(date){
-    ensureDateBuckets(date);
-    dayNotes.value = state.notesByDate[date] || '';
-  }
+  function loadDay(date){ ensureDateBuckets(date); dayNotes.value = state.notesByDate[date] || ''; }
   datePicker.oninput = () => loadDay(datePicker.value);
   dayNotes.oninput = () => { const d = datePicker.value; ensureDateBuckets(d); state.notesByDate[d] = dayNotes.value; saveState(); };
   jumpToday.onclick = () => { datePicker.value = todayISO; loadDay(todayISO); };
 
   /* ------------------------- Weekly planner ------------------------- */
   const weekGrid = document.getElementById('weekGrid');
-
   function isoWeekKey(dateISO){
     const d = new Date(dateISO+'T00:00:00');
     const target = new Date(d.valueOf());
-    const dayNr = (d.getUTCDay() + 6) % 7; // Mon=0
+    const dayNr = (d.getUTCDay() + 6) % 7;
     target.setUTCDate(target.getUTCDate() - dayNr + 3);
     const firstThursday = new Date(Date.UTC(target.getUTCFullYear(),0,4));
     const week = 1 + Math.round(((target - firstThursday) / 86400000 - 3) / 7);
     const year = target.getUTCFullYear();
     return `${year}-W${String(week).padStart(2,'0')}`;
   }
-
   function renderWeekly(){
     const key = isoWeekKey(todayISO);
     state.weekly[key] ??= {Mon:'',Tue:'',Wed:'',Thu:'',Fri:'',Sat:'',Sun:''};
@@ -729,10 +820,7 @@ canvas{
       const li = document.createElement('li');
       li.innerHTML = `
         <div class="li-left">
-          <span class="chip" title="Subject">
-            <span class="swatch" style="background:${subj?.color || '#94a3b8'}"></span>
-            ${escapeHtml(item.subject || 'No subject')}
-          </span>
+          <span class="chip" title="Subject"><span class="swatch" style="background:${subj?.color || '#94a3b8'}"></span>${escapeHtml(item.subject || 'No subject')}</span>
           <div class="li-title">${escapeHtml(item.t)}</div>
         </div>
         <div class="small">${item.due ? 'Due: '+item.due : ''}</div>
@@ -756,13 +844,10 @@ canvas{
       taskInput.value='';
     }
   };
-
-  // Quick add (Overview)
   document.getElementById('quickAddTask').onclick = () => {
     addTask(document.getElementById('quickTask').value, document.getElementById('quickSubject').value, '');
     document.getElementById('quickTask').value='';
   };
-
   renderTasks();
 
   /* ------------------------- Study tracker ------------------------- */
@@ -803,15 +888,13 @@ canvas{
       studyInput.value='';
     }
   };
-
   document.getElementById('quickAddStudy').onclick = () => {
     addTopic(document.getElementById('quickStudy').value, document.getElementById('quickStudySubject').value);
     document.getElementById('quickStudy').value='';
   };
-
   renderStudy();
 
-  /* ------------------------- Pomodoro (cycles + breaks) ------------------------- */
+  /* ------------------------- Pomodoro ------------------------- */
   const timerEl = document.getElementById('timer');
   const sessionLabel = document.getElementById('sessionLabel');
   const cycleLabel = document.getElementById('cycleLabel');
@@ -854,7 +937,6 @@ canvas{
     updateTimerUI();
 
     if(secondsLeft <= 0){
-      // Log focus minutes at end of a focus block
       if(phase === 'focus'){
         const mins = Math.round(focusSecondsLoggedThisBlock/60);
         if(mins>0){
@@ -865,7 +947,6 @@ canvas{
         focusSecondsLoggedThisBlock = 0;
       }
 
-      // Switch phase
       if(phase === 'focus'){
         phase = 'break';
         secondsLeft = (cycle === 4 ? parseInt(longBreakMin.value,10) : parseInt(breakMin.value,10)) * 60;
@@ -879,10 +960,7 @@ canvas{
     }
   }
 
-  startP.onclick = () => {
-    if(pInterval) return;
-    pInterval = setInterval(tick, 1000);
-  };
+  startP.onclick = () => { if(pInterval) return; pInterval = setInterval(tick, 1000); };
   pauseP.onclick = () => { if(pInterval){ clearInterval(pInterval); pInterval = null; } };
   resetP.onclick = () => { if(pInterval){ clearInterval(pInterval); pInterval = null; } setFromInputs(); };
   focusMin.onchange = setFromInputs;
@@ -960,6 +1038,9 @@ canvas{
   const logSba = document.getElementById('logSba');
   const sbaLog = document.getElementById('sbaLog');
 
+  function sumSbaForDate(date){ ensureDateBuckets(date); return (state.sbaByDate[date]||[]).reduce((a,x)=>a+(x.n||0),0); }
+  function sumSbaLastNDays(n){ let total=0; for(let i=0;i<n;i++) total += sumSbaForDate(dateNDaysAgo(i)); return total; }
+
   function renderSba(){
     ensureDateBuckets(todayISO);
     sbaLog.innerHTML='';
@@ -976,7 +1057,6 @@ canvas{
       li.onclick=()=>{ state.sbaByDate[todayISO].splice(i,1); saveState(); renderSba(); drawAll(); };
       sbaLog.appendChild(li);
     });
-
     document.getElementById('sbaToday').textContent = `Today: ${sumSbaForDate(todayISO)}`;
     document.getElementById('sbaWeek').textContent = `This week: ${sumSbaLastNDays(7)}`;
   }
@@ -991,10 +1071,9 @@ canvas{
     renderSba();
     drawAll();
   };
-
   renderSba();
 
-  /* ------------------------- Sessions (Anki / Qbank etc.) ------------------------- */
+  /* ------------------------- Sessions ------------------------- */
   const logAnki = document.getElementById('logAnki');
   const ankiType = document.getElementById('ankiType');
   const ankiMinutes = document.getElementById('ankiMinutes');
@@ -1025,14 +1104,13 @@ canvas{
     if(!mins || mins < 1) return;
     ensureDateBuckets(todayISO);
     state.sessionsByDate[todayISO].unshift({type:ankiType.value, minutes:mins, subject:ankiSubject.value||'', note:ankiNote.value.trim(), ts:new Date().toISOString()});
-    state.focusMinutesByDate[todayISO] += mins; // feeds analytics
+    state.focusMinutesByDate[todayISO] += mins;
     ankiMinutes.value='';
     ankiNote.value='';
     saveState();
     renderSessions();
     drawAll();
   };
-
   renderSessions();
 
   /* ------------------------- Research / Projects ------------------------- */
@@ -1047,9 +1125,7 @@ canvas{
     state.projects.forEach((p,i)=>{
       const li = document.createElement('li');
       li.innerHTML = `
-        <div class="li-left">
-          <div class="li-title">${escapeHtml(p.name)}${p.next ? ' — '+escapeHtml(p.next) : ''}</div>
-        </div>
+        <div class="li-left"><div class="li-title">${escapeHtml(p.name)}${p.next ? ' — '+escapeHtml(p.next) : ''}</div></div>
         <div class="small">${p.due ? 'Due: '+p.due : ''}</div>
       `;
       li.onclick=()=>{ state.projects.splice(i,1); saveState(); renderProjects(); };
@@ -1065,22 +1141,16 @@ canvas{
     saveState();
     renderProjects();
   };
-
   renderProjects();
 
   /* ------------------------- Heatmap + Analytics Charts ------------------------- */
-  function dateNDaysAgo(n){
-    const d = new Date();
-    d.setDate(d.getDate()-n);
-    return d.toISOString().slice(0,10);
-  }
+  function dateNDaysAgo(n){ const d = new Date(); d.setDate(d.getDate()-n); return d.toISOString().slice(0,10); }
 
   function intensityForDate(date){
     ensureDateBuckets(date);
     const topics = (state.topicsByDate[date]||[]).length;
     const mins = state.focusMinutesByDate[date]||0;
     const sba = (state.sbaByDate[date]||[]).reduce((a,x)=>a+(x.n||0),0);
-    // Weighted score
     return topics*3 + Math.min(mins,180)/15 + Math.min(sba,200)/20;
   }
 
@@ -1094,11 +1164,7 @@ canvas{
       const c = document.createElement('div');
       c.className='cell';
       const p = v/max;
-      // map to alpha of accent (simple, theme-safe)
-      c.style.background = `rgba(79,70,229,${0.08 + 0.55*p})`;
-      if(document.documentElement.getAttribute('data-theme')==='dark'){
-        c.style.background = `rgba(124,58,237,${0.10 + 0.55*p})`;
-      }
+      c.style.background = `rgba(124,58,237,${0.10 + 0.65*p})`;
       c.title = `${dateNDaysAgo(27-idx)} • score ${v.toFixed(1)}`;
       el.appendChild(c);
     });
@@ -1110,39 +1176,31 @@ canvas{
     const W = c.width, H = c.height;
     ctx.clearRect(0,0,W,H);
 
-    // background
-    ctx.fillStyle = 'rgba(0,0,0,0)';
-    ctx.fillRect(0,0,W,H);
-
     const max = Math.max(1, ...values);
-    const pad = 30;
+    const pad = 34;
     const bw = (W - pad*2) / values.length;
 
-    // axes
-    ctx.strokeStyle = 'rgba(148,163,184,0.6)';
+    ctx.strokeStyle = 'rgba(148,163,184,0.55)';
     ctx.beginPath();
     ctx.moveTo(pad, H-pad);
     ctx.lineTo(W-pad, H-pad);
     ctx.stroke();
 
-    // bars
     for(let i=0;i<values.length;i++){
       const v = values[i];
       const h = (H - pad*2) * (v/max);
-      const x = pad + i*bw + 8;
+      const x = pad + i*bw + 10;
       const y = (H - pad) - h;
-      const w = bw - 16;
+      const w = bw - 20;
 
-      ctx.fillStyle = (document.documentElement.getAttribute('data-theme')==='dark')
-        ? 'rgba(124,58,237,0.85)'
-        : 'rgba(79,70,229,0.85)';
+      const grad = ctx.createLinearGradient(0,y,0,y+h);
+      grad.addColorStop(0,'rgba(6,182,212,0.85)');
+      grad.addColorStop(1,'rgba(124,58,237,0.85)');
+      ctx.fillStyle = grad;
       ctx.fillRect(x,y,w,h);
 
-      // labels (tiny)
-      ctx.fillStyle = (document.documentElement.getAttribute('data-theme')==='dark')
-        ? 'rgba(229,231,235,0.8)'
-        : 'rgba(17,24,39,0.7)';
-      ctx.font = '12px Inter, system-ui, sans-serif';
+      ctx.fillStyle = 'rgba(231,240,255,0.85)';
+      ctx.font = '14px Rajdhani, Inter, system-ui, sans-serif';
       ctx.fillText(labels[i], x, H - 10);
     }
   }
@@ -1176,16 +1234,6 @@ canvas{
     return out;
   }
 
-  function sumSbaForDate(date){
-    ensureDateBuckets(date);
-    return (state.sbaByDate[date]||[]).reduce((a,x)=>a+(x.n||0),0);
-  }
-  function sumSbaLastNDays(n){
-    let total=0;
-    for(let i=0;i<n;i++) total += sumSbaForDate(dateNDaysAgo(i));
-    return total;
-  }
-
   function updateSummary(){
     ensureDateBuckets(todayISO);
     document.getElementById('sumFocus').textContent = `Focus today: ${state.focusMinutesByDate[todayISO]||0} min`;
@@ -1200,7 +1248,7 @@ canvas{
     drawBarChart('topicChart', lastNDaysLabels(7), lastNDaysValuesTopics(7));
   }
 
-  /* ------------------------- Export / Import (DIY Cloud Sync) ------------------------- */
+  /* ------------------------- Export / Import ------------------------- */
   document.getElementById('exportBtn').onclick = () => {
     const data = JSON.stringify(state, null, 2);
     const blob = new Blob([data], {type:'application/json'});
@@ -1255,11 +1303,7 @@ canvas{
   };
 
   /* ------------------------- Utilities ------------------------- */
-  function getSubject(name){
-    if(!name) return null;
-    return state.subjects.find(s => s.name === name) || null;
-  }
-
+  function getSubject(name){ if(!name) return null; return state.subjects.find(s => s.name === name) || null; }
   function escapeHtml(str){
     return String(str)
       .replaceAll('&','&amp;')
@@ -1273,12 +1317,10 @@ canvas{
   drawAll();
 
   // Ensure overview quick selects are populated
-  document.getElementById('quickSubject').value = '';
-  document.getElementById('quickStudySubject').value = '';
+  refreshSubjectSelects();
 
   // Default view
   show('overview');
-
 </script>
 </body>
 </html>
