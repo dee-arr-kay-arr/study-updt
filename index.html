@@ -563,7 +563,7 @@ canvas{
     themeBtn.textContent = state.meta.theme === 'dark' ? '☀️' : '🌙';
   }
   themeBtn.onclick = () => {
-    state.meta.theme = state.meta.theme === 'dark' ? 'light' : 'dark';
+    state.meta.theme = state.meta.theme === 'dark' ? 'dark' : 'dark';
     saveState();
     applyTheme();
     drawAll();
