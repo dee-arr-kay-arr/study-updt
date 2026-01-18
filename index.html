@@ -162,6 +162,7 @@
       font-weight:600;
       font-family: inherit;
       transition: transform .12s ease, box-shadow .12s ease, filter .12s ease;
+      white-space: nowrap;
     }
     .btn:hover{transform: translateY(-1px); box-shadow: 0 0 18px rgba(124,58,237,.22)}
     .btn.primary{
@@ -174,6 +175,10 @@
       background: linear-gradient(90deg, rgba(251,113,133,0.85), rgba(124,58,237,0.45));
       border-color: rgba(251,113,133,0.35);
       box-shadow: 0 0 18px rgba(251,113,133,.18);
+    }
+    .btn.ghost{
+      background: rgba(3,6,14,0.18);
+      border-color: rgba(120,160,255,0.14);
     }
 
     .layout{display:grid;grid-template-columns:290px 1fr;min-height:calc(100vh - 64px);position:relative;z-index:1}
@@ -324,64 +329,22 @@
       100%{ box-shadow: var(--shadow), var(--glow2); }
     }
     .card{ animation: breathe 3.2s ease-in-out infinite alternate; }
-/* Streak badge levels */
-.badge{
-  display:inline-flex;align-items:center;gap:8px;
-  padding:8px 12px;border-radius:999px;
-  border:1px solid rgba(120,160,255,0.20);
-  background: rgba(124,58,237,0.10);
-  font-size:14px;font-weight:700;
-}
-.badge .gem{width:10px;height:10px;border-radius:999px}
-.b-none .gem{background:#94a3b8;}
-.b-bronze .gem{background:#fb923c;}
-.b-silver .gem{background:#e5e7eb;}
-.b-gold .gem{background:#facc15;}
-.b-diamond .gem{background:#06b6d4;}
-.badge strong{letter-spacing:.7px}
 
-/* XP bar */
-.xpbarWrap{margin-top:10px}
-.xpbar{
-  height: 12px;border-radius:999px;
-  background: rgba(120,160,255,0.10);
-  border: 1px solid rgba(120,160,255,0.18);
-  overflow:hidden;
-}
-.xpfill{
-  height:100%;
-  background: linear-gradient(90deg, rgba(34,197,94,0.85), rgba(6,182,212,0.75), rgba(124,58,237,0.75));
-  width:0%;
-}
-.xpmeta{display:flex;justify-content:space-between;font-size:14px;color:var(--muted);margin-bottom:8px}
+    /* OSCE template UI */
+    .osce-tools{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      margin-top:10px;
+    }
+    .osce-tools > *{flex:1}
+    .osce-hint{
+      margin-top:8px;
+      color: var(--muted);
+      font-size: 14px;
+    }
 
-/* Mission row + tick animation */
-.mission{
-  display:flex;align-items:center;justify-content:space-between;gap:10px;
-  padding:10px 10px;border-radius:14px;
-  border:1px solid rgba(120,160,255,0.14);
-  background: rgba(3,6,14,0.18);
-  margin-top:8px;
-}
-.mission .left{display:flex;gap:10px;align-items:center;min-width:0}
-.mission .m-ico{width:18px;height:18px;display:inline-grid;place-items:center;opacity:.95}
-.mission .m-text{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.mission.done{border-color: rgba(34,197,94,0.22); background: rgba(34,197,94,0.06)}
-
-.tick{
-  display:inline-grid;place-items:center;
-  width:22px;height:22px;border-radius:999px;
-  border:1px solid rgba(120,160,255,0.12);
-  opacity:0; transform: scale(.85);
-}
-.mission.done .tick{
-  opacity:1;
-  border-color: rgba(34,197,94,0.30);
-  background: rgba(34,197,94,0.08);
-  animation: tickPop .18s ease-out, tickGlow 1.1s ease-out;
-}
-@keyframes tickPop{from{transform: scale(.7);}to{transform: scale(1);}}
-@keyframes tickGlow{40%{box-shadow:0 0 18px rgba(34,197,94,.25);}}
     /* Mobile */
     @media (max-width: 980px){
       body{font-size: 17px;}
@@ -451,15 +414,7 @@
             <span class="chip" id="countdownChip">Set an exam date →</span>
           </div>
         </div>
-<div class="row" style="margin-top:10px">
-  <span class="badge b-none" id="streakChip"><span class="gem"></span>Streak: 0 <strong>NONE</strong></span>
-  <span class="chip" id="missionChip">Missions: 0/3</span>
-</div>
 
-<div class="xpbarWrap">
-  <div class="xpmeta"><span id="xpLabel">Level 1</span><span id="xpRight">0 / 100</span></div>
-  <div class="xpbar"><div class="xpfill" id="xpFill" style="width:0%"></div></div>
-</div>
         <div class="card" style="grid-column: span 6;">
           <h2>🎯 Exam Countdown</h2>
           <p class="sub">Set your target exam date.</p>
@@ -472,11 +427,7 @@
             <div class="chip"><span class="swatch" style="background:var(--accent2)"></span>Topics → XP vibe</div>
           </div>
         </div>
-<div class="card" style="grid-column: span 6;">
-  <h2>🎮 Daily Missions</h2>
-  <p class="sub">Small goals → streak + XP.</p>
-  <div id="missions"></div>
-</div>
+
         <div class="card" style="grid-column: span 7;">
           <h2>🧷 Subjects</h2>
           <p class="sub">Colour-coded tags for tasks & study entries.</p>
@@ -571,18 +522,34 @@
         <p class="small" style="margin-top:10px">Default: 25/5 with a long break after 4 focus blocks.</p>
       </section>
 
-      <!-- OSCE -->
+      <!-- OSCE (UPDATED) -->
       <section id="osce" class="card" style="display:none">
-        <h2>🩺 OSCE Checklist</h2>
-        <p class="sub">Make station checklists (e.g., Resp exam, Neuro exam, Derm history).</p>
-        <div class="row">
-          <input id="osceStation" placeholder="Station name (e.g. Cranial nerve exam)" />
+        <h2>🩺 OSCE Checklists</h2>
+        <p class="sub">Create a station manually or spawn one from a template (Parkinsonism, Upper limb neuro etc.).</p>
+
+        <!-- Template creator -->
+        <div class="osce-tools">
+          <select id="osceTemplate">
+            <option value="">Choose a template…</option>
+            <option value="tmpl_parkinsons_ul">Parkinsonism / Tremor (Upper Limb Exam)</option>
+            <option value="tmpl_ul_neuro_full">Upper Limb Neurological Exam (Motor + Sensory + Coordination)</option>
+          </select>
+          <button class="btn primary" id="createFromTemplate">Create station from template</button>
+          <button class="btn ghost" id="appendTemplate">Append template to current station</button>
+        </div>
+        <div class="osce-hint">Tip: “Create” makes a new station. “Append” adds steps into the station you’re currently editing.</div>
+
+        <!-- Manual create -->
+        <div class="row" style="margin-top:12px">
+          <input id="osceStation" placeholder="Station name (e.g. Upper limb neuro exam)" />
           <button class="btn primary" id="createStation">Create station</button>
         </div>
+
         <div class="row" style="margin-top:10px">
           <select id="osceSelect"></select>
           <input id="osceItem" placeholder="Add checklist item (e.g. Inspect for scars)" />
         </div>
+
         <ul id="osceList" style="margin-top:10px"></ul>
         <p class="small" style="margin-top:8px">Click an item to toggle done. Double-click to delete.</p>
       </section>
@@ -894,7 +861,7 @@
         </div>
         <div class="small">${item.due ? 'Due: '+item.due : ''}</div>
       `;
-      li.onclick = () => { state.tasksByDate[todayISO].splice(i,1); saveState(); renderTasks();addXP(6);};
+      li.onclick = () => { state.tasksByDate[todayISO].splice(i,1); saveState(); renderTasks(); };
       taskList.appendChild(li);
     });
   }
@@ -949,8 +916,6 @@
     saveState();
     renderStudy();
     drawAll();
-    addXP(12);
-
   }
 
   studyInput.onkeydown = e => {
@@ -1039,12 +1004,52 @@
   longBreakMin.onchange = setFromInputs;
   setFromInputs();
 
-  /* ------------------------- OSCE Checklist ------------------------- */
+  /* ------------------------- OSCE Checklist (UPDATED: templates) ------------------------- */
   const osceStation = document.getElementById('osceStation');
   const createStation = document.getElementById('createStation');
   const osceSelect = document.getElementById('osceSelect');
   const osceItem = document.getElementById('osceItem');
   const osceList = document.getElementById('osceList');
+
+  const osceTemplate = document.getElementById('osceTemplate');
+  const createFromTemplate = document.getElementById('createFromTemplate');
+  const appendTemplate = document.getElementById('appendTemplate');
+
+  // Templates (paraphrased from Macleod’s neuro integrated sequence + tremor OSCE example)
+  const OSCE_TEMPLATES = {
+    tmpl_parkinsons_ul: {
+      name: "Parkinsonism / Tremor (Upper Limb Exam)",
+      items: [
+        {text:"Introduce yourself, confirm patient identity, explain exam + consent, hand hygiene.", done:false},
+        {text:"Observe patient at rest: tremor, posture, facial expression (hypomimia), drooling/jaw tremor.", done:false},
+        {text:"Listen to speech: volume, monotone, hypophonia.", done:false},
+        {text:"Postural testing: arms raised then outstretched; watch for tremor on posture.", done:false},
+        {text:"Bradykinesia screen: rapid finger taps / ‘piano-playing’ movements; compare sides.", done:false},
+        {text:"Assess tone (move limb slowly): look for rigidity + cogwheeling (reinforce with distraction if needed).", done:false},
+        {text:"Power screen: shoulder abduction, elbow flexion/extension, finger extension (compare sides).", done:false},
+        {text:"Reflexes: biceps, supinator, triceps (compare sides).", done:false},
+        {text:"Coordination: finger-to-nose and rapid alternating movements.", done:false},
+        {text:"Gait: ask patient to walk/turn; observe arm swing, tremor change, stride length + shuffling/freezing.", done:false},
+        {text:"Close: thank patient, ensure comfort, hand hygiene, summarise key findings + likely diagnosis.", done:false},
+      ]
+    },
+    tmpl_ul_neuro_full: {
+      name: "Upper Limb Neurological Exam (Motor + Sensory + Coordination)",
+      items: [
+        {text:"Introduce yourself, confirm identity, explain exam + consent, hand hygiene; expose arms appropriately.", done:false},
+        {text:"Inspect: wasting, fasciculations, tremor/abnormal movements, deformity/contractures; compare sides.", done:false},
+        {text:"Screen: arms outstretched (palms up), eyes closed → watch for pronator drift.", done:false},
+        {text:"Tone: assess at wrist/elbow; compare sides; note spasticity vs rigidity.", done:false},
+        {text:"Power: shoulder abduction; elbow flexion/extension; finger extension.", done:false},
+        {text:"Power: index finger abduction, little finger abduction, thumb abduction; compare sides.", done:false},
+        {text:"Reflexes: biceps (C5), supinator/brachioradialis (C6), triceps (C7); compare sides.", done:false},
+        {text:"Coordination: finger-to-nose; rapid alternating movements (dysdiadochokinesia).", done:false},
+        {text:"Sensation: light touch/pinprick ± temperature; then vibration + joint position sense if indicated.", done:false},
+        {text:"Functional screen: ask about pain; check hand function (grip/pinch) if relevant.", done:false},
+        {text:"Close: thank patient, ensure comfort, hand hygiene, summarise findings + localisation if possible.", done:false},
+      ]
+    }
+  };
 
   function refreshOsceStations(){
     osceSelect.innerHTML = '';
@@ -1060,6 +1065,29 @@
       o.value = name; o.textContent = name;
       osceSelect.appendChild(o);
     });
+  }
+
+  function ensureStation(name){
+    if(!name) return false;
+    if(!state.osce.stations[name]){
+      state.osce.stations[name] = [];
+      state.osce.order.unshift(name);
+    }else{
+      // move to top for convenience
+      state.osce.order = [name, ...state.osce.order.filter(x => x !== name)];
+    }
+    return true;
+  }
+
+  function addItemsToStation(stationName, items){
+    if(!ensureStation(stationName)) return;
+    const arr = state.osce.stations[stationName];
+    // append items to end (keeps any custom items you already added)
+    items.forEach(it => arr.push({text: it.text, done: false}));
+    saveState();
+    refreshOsceStations();
+    osceSelect.value = stationName;
+    renderOsce();
   }
 
   function renderOsce(){
@@ -1103,6 +1131,31 @@
     }
   };
 
+  createFromTemplate.onclick = () => {
+    const key = osceTemplate.value;
+    if(!key) return alert('Choose a template first.');
+    const tmpl = OSCE_TEMPLATES[key];
+    if(!tmpl) return;
+
+    // create a NEW station; if name exists, add a suffix
+    let name = tmpl.name;
+    let suffix = 2;
+    while(state.osce.stations[name]){
+      name = `${tmpl.name} (${suffix})`;
+      suffix++;
+    }
+    addItemsToStation(name, tmpl.items);
+  };
+
+  appendTemplate.onclick = () => {
+    const key = osceTemplate.value;
+    if(!key) return alert('Choose a template first.');
+    const tmpl = OSCE_TEMPLATES[key];
+    const station = osceSelect.value;
+    if(!station) return alert('Select a station first (or create one).');
+    addItemsToStation(station, tmpl.items);
+  };
+
   /* ------------------------- SBA Counter ------------------------- */
   const sbaCount = document.getElementById('sbaCount');
   const sbaSubject = document.getElementById('sbaSubject');
@@ -1141,7 +1194,6 @@
     saveState();
     renderSba();
     drawAll();
-    addXP(Math.min(20, Math.round(n/2)));
   };
   renderSba();
 
@@ -1313,134 +1365,12 @@
     document.getElementById('sumSba').textContent = `SBAs today: ${sumSbaForDate(todayISO)}`;
   }
 
- function drawAll(){
-  renderHeatmap();
-  updateSummary();
-  drawBarChart('focusChart', lastNDaysLabels(7), lastNDaysValuesFocus(7));
-  drawBarChart('topicChart', lastNDaysLabels(7), lastNDaysValuesTopics(7));
-  updateXPUI();
-  updateStreakUI();
-  drawMissions();
-}
-  /* ------------------------- XP system ------------------------- */
-function getXP(){
-  const k = 'msd.xp.'+todayISO;
-  return parseInt(localStorage.getItem(k)||'0',10);
-}
-function setXP(v){
-  const k = 'msd.xp.'+todayISO;
-  localStorage.setItem(k, String(Math.max(0, v)));
-}
-function addXP(delta){
-  if(!delta) return;
-  setXP(getXP() + delta);
-  updateXPUI();
-}
-function updateXPUI(){
-  const elFill = document.getElementById('xpFill');
-  const elLabel = document.getElementById('xpLabel');
-  const elRight = document.getElementById('xpRight');
-  if(!elFill || !elLabel || !elRight) return;
-
-  const xp = getXP();
-  const cap = 100;
-  const pct = Math.min(100, Math.round((xp % cap) / cap * 100));
-  const level = Math.floor(xp / cap) + 1;
-  elLabel.textContent = `Level ${level}`;
-  elRight.textContent = `${xp % cap} / ${cap}`;
-  elFill.style.width = pct + '%';
-}
-
-/* ------------------------- Streak system + badge levels ------------------------- */
-function streakBadge(streak){
-  if(streak >= 30) return {cls:'b-diamond', name:'DIAMOND'};
-  if(streak >= 14) return {cls:'b-gold', name:'GOLD'};
-  if(streak >= 7)  return {cls:'b-silver', name:'SILVER'};
-  if(streak >= 3)  return {cls:'b-bronze', name:'BRONZE'};
-  return {cls:'b-none', name:'NONE'};
-}
-
-function dayComplete(date){
-  ensureDateBuckets(date);
-  const topics = (state.topicsByDate[date]||[]).length;
-  const focus  = state.focusMinutesByDate[date]||0;
-  const sba    = sumSbaForDate(date);
-  let ok = 0;
-  if(topics >= 1) ok++;
-  if(focus >= 20) ok++;
-  if(sba >= 10) ok++;
-  return ok >= 2;
-}
-
-function computeStreak(){
-  let streak = 0;
-  for(let i=0;i<365;i++){
-    const d = dateNDaysAgo(i);
-    if(dayComplete(d)) streak++;
-    else break;
+  function drawAll(){
+    renderHeatmap();
+    updateSummary();
+    drawBarChart('focusChart', lastNDaysLabels(7), lastNDaysValuesFocus(7));
+    drawBarChart('topicChart', lastNDaysLabels(7), lastNDaysValuesTopics(7));
   }
-  return streak;
-}
-
-function updateStreakUI(){
-  const el = document.getElementById('streakChip');
-  if(!el) return;
-  const s = computeStreak();
-  const b = streakBadge(s);
-  el.className = `badge ${b.cls}`;
-  el.innerHTML = `<span class="gem"></span>Streak: ${s} <strong>${b.name}</strong>`;
-}
-
-/* ------------------------- Daily missions (with tick animation) ------------------------- */
-function missionStatus(){
-  ensureDateBuckets(todayISO);
-  const topics = (state.topicsByDate[todayISO]||[]).length;
-  const focus  = state.focusMinutesByDate[todayISO]||0;
-  const sba    = sumSbaForDate(todayISO);
-  return {
-    topic: {done: topics >= 1, text:`Log 1 topic (${Math.min(1,topics)}/1)`},
-    focus: {done: focus >= 20, text:`Focus 20 min (${Math.min(20,focus)}/20)`},
-    sba:   {done: sba >= 10,   text:`Do 10 SBAs (${Math.min(10,sba)}/10)`}
-  };
-}
-
-function drawMissions(){
-  const container = document.getElementById('missions');
-  const chip = document.getElementById('missionChip');
-  if(!container || !chip) return;
-
-  const m = missionStatus();
-  container.innerHTML = '';
-
-  const missions = [
-    {ico:'✦', label:m.topic.text, done:m.topic.done},
-    {ico:'⏱', label:m.focus.text, done:m.focus.done},
-    {ico:'▦', label:m.sba.text, done:m.sba.done},
-  ];
-
-  let doneCount = 0;
-
-  missions.forEach(x=>{
-    if(x.done) doneCount++;
-    const el = document.createElement('div');
-    el.className = 'mission' + (x.done ? ' done' : '');
-    el.innerHTML = `
-      <div class="left">
-        <span class="m-ico">${x.ico}</span>
-        <div class="m-text">${escapeHtml(x.label)}</div>
-      </div>
-      <span class="tick">✓</span>
-    `;
-    container.appendChild(el);
-  });
-
-  chip.textContent = `Missions: ${doneCount}/3`;
-
-  if(doneCount === 3 && localStorage.getItem('msd.mission.done.'+todayISO) !== '1'){
-    localStorage.setItem('msd.mission.done.'+todayISO, '1');
-    addXP(20);
-  }
-}
 
   /* ------------------------- Export / Import ------------------------- */
   document.getElementById('exportBtn').onclick = () => {
