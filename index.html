@@ -1,0 +1,1136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Medical Study Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#f4f6fb;
+      --panel:#ffffff;
+      --text:#111827;
+      --muted:#6b7280;
+      --border:#e5e7eb;
+      --accent:#4f46e5;
+      --accent2:#22c55e;
+      --shadow:0 1px 4px rgba(0,0,0,.05);
+      --chip:#eef2ff;
+    }
+    [data-theme="dark"]{
+      --bg:#0b1220;
+      --panel:#0f172a;
+      --text:#e5e7eb;
+      --muted:#9ca3af;
+      --border:#1f2937;
+      --accent:#7c3aed;
+      --accent2:#22c55e;
+      --shadow:0 1px 10px rgba(0,0,0,.35);
+      --chip:#1e293b;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--text)}
+
+    header{
+      height:56px;display:flex;align-items:center;justify-content:space-between;
+      padding:0 16px;background:var(--panel);border-bottom:1px solid var(--border);
+      font-weight:600;position:sticky;top:0;z-index:10
+    }
+    .brand{display:flex;gap:10px;align-items:center}
+    .dot{width:10px;height:10px;border-radius:50%;background:var(--accent)}
+    .top-actions{display:flex;gap:8px;align-items:center}
+    .btn{
+      border:1px solid var(--border);background:var(--panel);color:var(--text);
+      padding:8px 10px;border-radius:10px;cursor:pointer;font-weight:500
+    }
+    .btn.primary{background:var(--accent);border-color:var(--accent);color:white}
+    .btn.ghost{background:transparent}
+
+    .layout{display:grid;grid-template-columns:270px 1fr;min-height:calc(100vh - 56px)}
+    aside{background:var(--panel);border-right:1px solid var(--border);padding:14px;position:sticky;top:56px;height:calc(100vh - 56px);overflow:auto}
+    .navTitle{font-size:12px;text-transform:uppercase;color:var(--muted);margin:6px 0 12px}
+    .nav button{
+      width:100%;padding:10px 12px;margin-bottom:8px;border-radius:12px;border:1px solid var(--border);
+      background:transparent;color:var(--text);cursor:pointer;font-weight:500;text-align:left
+    }
+    .nav button.active{background:var(--chip);border-color:transparent}
+
+    main{padding:16px;max-width:1200px;margin:0 auto;width:100%}
+
+    .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:12px}
+    .card{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:14px;box-shadow:var(--shadow)}
+    .card h2{margin:0 0 8px;font-size:15px}
+    .sub{color:var(--muted);font-size:12px;margin:0 0 10px}
+
+    input,textarea,select{
+      width:100%;padding:10px;border-radius:12px;border:1px solid var(--border);
+      background:transparent;color:var(--text);font-family:inherit
+    }
+    textarea{resize:vertical}
+
+    .row{display:flex;gap:10px;flex-wrap:wrap}
+    .row > *{flex:1}
+
+    ul{list-style:none;padding:0;margin:0}
+    li{padding:10px 0;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px}
+    .li-left{display:flex;align-items:center;gap:10px;min-width:0}
+    .li-title{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+    .chip{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:var(--chip);font-size:12px;color:var(--text)}
+    .swatch{width:10px;height:10px;border-radius:999px;background:#94a3b8}
+
+    .kpi{display:flex;gap:10px;flex-wrap:wrap}
+    .kpi .chip{background:transparent;border:1px solid var(--border)}
+
+    .timer{font-size:38px;text-align:center;margin:12px 0 8px;font-weight:600;letter-spacing:1px}
+    .timerMeta{display:flex;justify-content:space-between;color:var(--muted);font-size:12px}
+
+    .heatmap{display:grid;grid-template-columns:repeat(14, 1fr);gap:6px}
+    .cell{height:16px;border-radius:4px;border:1px solid var(--border);background:transparent}
+
+    .week{display:grid;grid-template-columns:repeat(7,1fr);gap:8px}
+    .dayBox{border:1px solid var(--border);border-radius:12px;padding:10px}
+    .dayBox h4{margin:0 0 8px;font-size:12px;color:var(--muted);text-transform:uppercase}
+
+    canvas{width:100%;height:180px;border-radius:12px;border:1px solid var(--border);background:transparent}
+
+    .small{font-size:12px;color:var(--muted)}
+
+    /* Mobile-first improvements */
+    @media (max-width: 980px){
+      .layout{grid-template-columns:1fr}
+      aside{position:relative;top:0;height:auto;border-right:none;border-bottom:1px solid var(--border)}
+      main{padding:12px}
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div class="brand"><span class="dot"></span>Medical Study Dashboard</div>
+  <div class="top-actions">
+    <button class="btn" id="themeBtn" title="Toggle dark mode">🌙</button>
+    <button class="btn" id="exportBtn" title="Export data">Export</button>
+    <button class="btn" id="importBtn" title="Import data">Import</button>
+  </div>
+</header>
+
+<div class="layout">
+  <aside>
+    <div class="navTitle">Navigation</div>
+    <div class="nav">
+      <button data-view="overview" class="active">Overview</button>
+      <button data-view="calendar">Calendar</button>
+      <button data-view="weekly">Weekly Planner</button>
+      <button data-view="tasks">Tasks</button>
+      <button data-view="study">Study Tracker</button>
+      <button data-view="pomodoro">Pomodoro</button>
+      <button data-view="osce">OSCE Checklist</button>
+      <button data-view="sba">SBA Counter</button>
+      <button data-view="anki">Anki / Question Sessions</button>
+      <button data-view="research">Research / SFP Tracker</button>
+      <button data-view="analytics">Analytics</button>
+      <button data-view="settings">Settings</button>
+    </div>
+    <div style="margin-top:14px" class="small">
+      Tip: click an item in a list to delete/complete it.
+    </div>
+  </aside>
+
+  <main>
+    <!-- OVERVIEW -->
+    <section id="overview" class="grid">
+      <div class="card" style="grid-column: span 6;">
+        <h2>Today's Plan</h2>
+        <p class="sub">Ward round / teaching / revision focus.</p>
+        <textarea id="plan" rows="7" placeholder="e.g. Renal ward round + AKI NICE pathway + 40 SBAs"></textarea>
+      </div>
+
+      <div class="card" style="grid-column: span 6;">
+        <h2>Exam Countdown</h2>
+        <p class="sub">Set your target exam date; it appears on the dashboard.</p>
+        <div class="row">
+          <input type="date" id="examDate" />
+          <input id="examName" placeholder="Exam name (e.g. Finals / AKT / SJT)" />
+        </div>
+        <div class="kpi" style="margin-top:10px">
+          <span class="chip" id="countdownChip">Set an exam date →</span>
+          <span class="chip" id="todayChip"></span>
+        </div>
+      </div>
+
+      <div class="card" style="grid-column: span 7;">
+        <h2>Subjects</h2>
+        <p class="sub">Colour-coded tags for tasks & study entries.</p>
+        <div class="row">
+          <input id="subjectName" placeholder="Add subject (e.g. Nephrology)" />
+          <input id="subjectColor" type="color" value="#4f46e5" />
+          <button class="btn primary" id="addSubject">Add</button>
+        </div>
+        <div id="subjectChips" style="margin-top:10px" class="row"></div>
+      </div>
+
+      <div class="card" style="grid-column: span 5;">
+        <h2>Weekly Heatmap</h2>
+        <p class="sub">Study intensity over the last 28 days (topics + focus minutes).</p>
+        <div class="heatmap" id="heatmap"></div>
+        <div class="timerMeta" style="margin-top:10px"><span id="hmLegendL">Less</span><span id="hmLegendR">More</span></div>
+      </div>
+
+      <div class="card" style="grid-column: span 12;">
+        <h2>Quick Add</h2>
+        <p class="sub">Log something fast without switching tabs.</p>
+        <div class="row">
+          <input id="quickTask" placeholder="Task (e.g. Review renal biopsy patterns)" />
+          <select id="quickSubject"></select>
+          <button class="btn primary" id="quickAddTask">Add Task</button>
+        </div>
+        <div class="row" style="margin-top:10px">
+          <input id="quickStudy" placeholder="Completed topic (e.g. Nephrotic syndrome DDx)" />
+          <select id="quickStudySubject"></select>
+          <button class="btn primary" id="quickAddStudy">Log Topic</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- CALENDAR -->
+    <section id="calendar" class="card" style="display:none">
+      <h2>Calendar</h2>
+      <p class="sub">Pick a date for daily notes.</p>
+      <div class="row">
+        <input type="date" id="datePicker" />
+        <button class="btn" id="jumpToday">Jump to today</button>
+      </div>
+      <textarea id="dayNotes" rows="10" placeholder="Notes for selected day"></textarea>
+    </section>
+
+    <!-- WEEKLY -->
+    <section id="weekly" class="card" style="display:none">
+      <h2>Weekly Planner</h2>
+      <p class="sub">Plan your week (Mon–Sun). Stored per ISO week.</p>
+      <div class="week" id="weekGrid"></div>
+    </section>
+
+    <!-- TASKS -->
+    <section id="tasks" class="card" style="display:none">
+      <h2>Tasks</h2>
+      <p class="sub">Enter to add. Click a task to remove/complete.</p>
+      <div class="row">
+        <input id="taskInput" placeholder="Add task (e.g. Renal OSCE practice)" />
+        <select id="taskSubject"></select>
+        <input id="taskDue" type="date" />
+      </div>
+      <ul id="taskList" style="margin-top:10px"></ul>
+    </section>
+
+    <!-- STUDY -->
+    <section id="study" class="card" style="display:none">
+      <h2>Study Tracker</h2>
+      <p class="sub">Log completed topics with subject tags.</p>
+      <div class="row">
+        <input id="studyInput" placeholder="Completed topic" />
+        <select id="studySubject"></select>
+      </div>
+      <ul id="studyList" style="margin-top:10px"></ul>
+    </section>
+
+    <!-- POMODORO -->
+    <section id="pomodoro" class="card" style="display:none">
+      <h2>Pomodoro</h2>
+      <p class="sub">Focus cycles + breaks. Logs minutes to analytics automatically.</p>
+      <div class="timer" id="timer">25:00</div>
+      <div class="timerMeta"><span id="sessionLabel">Focus</span><span id="cycleLabel">Cycle 1/4</span></div>
+      <div class="row" style="margin-top:12px">
+        <button class="btn primary" id="startP">Start</button>
+        <button class="btn" id="pauseP">Pause</button>
+        <button class="btn" id="resetP">Reset</button>
+      </div>
+      <div class="row" style="margin-top:12px">
+        <input id="focusMin" type="number" min="10" max="90" value="25" />
+        <input id="breakMin" type="number" min="3" max="30" value="5" />
+        <input id="longBreakMin" type="number" min="10" max="60" value="15" />
+      </div>
+      <p class="small" style="margin-top:10px">Default: 25/5 with a long break after 4 focus blocks.</p>
+    </section>
+
+    <!-- OSCE -->
+    <section id="osce" class="card" style="display:none">
+      <h2>OSCE Checklist</h2>
+      <p class="sub">Make station checklists (e.g., Resp exam, Neuro exam, Derm history).</p>
+      <div class="row">
+        <input id="osceStation" placeholder="Station name (e.g. Cranial nerve exam)" />
+        <button class="btn primary" id="createStation">Create station</button>
+      </div>
+      <div class="row" style="margin-top:10px">
+        <select id="osceSelect"></select>
+        <input id="osceItem" placeholder="Add checklist item (e.g. Inspect for scars)" />
+      </div>
+      <ul id="osceList" style="margin-top:10px"></ul>
+      <p class="small" style="margin-top:8px">Click an item to toggle done. Double-click to delete.</p>
+    </section>
+
+    <!-- SBA -->
+    <section id="sba" class="card" style="display:none">
+      <h2>SBA Counter</h2>
+      <p class="sub">Track questions done per day and per subject.</p>
+      <div class="row">
+        <input id="sbaCount" type="number" min="1" placeholder="How many SBAs now?" />
+        <select id="sbaSubject"></select>
+        <button class="btn primary" id="logSba">Log</button>
+      </div>
+      <div class="kpi" style="margin-top:10px">
+        <span class="chip" id="sbaToday">Today: 0</span>
+        <span class="chip" id="sbaWeek">This week: 0</span>
+      </div>
+      <ul id="sbaLog" style="margin-top:10px"></ul>
+    </section>
+
+    <!-- ANKI -->
+    <section id="anki" class="card" style="display:none">
+      <h2>Anki / Question Sessions</h2>
+      <p class="sub">Log revision sessions (minutes + what you used). Feeds analytics.</p>
+      <div class="row">
+        <select id="ankiType">
+          <option value="Anki">Anki</option>
+          <option value="Passmedicine">Passmedicine</option>
+          <option value="Qbank">Qbank</option>
+          <option value="Notes">Notes</option>
+        </select>
+        <input id="ankiMinutes" type="number" min="5" placeholder="Minutes" />
+        <select id="ankiSubject"></select>
+      </div>
+      <input id="ankiNote" placeholder="Optional note (e.g. AKI guidelines + diuretics)" />
+      <button class="btn primary" id="logAnki" style="margin-top:10px">Log Session</button>
+      <ul id="ankiLog" style="margin-top:10px"></ul>
+    </section>
+
+    <!-- RESEARCH -->
+    <section id="research" class="card" style="display:none">
+      <h2>Research / SFP Tracker</h2>
+      <p class="sub">Track projects, actions, and deadlines.</p>
+      <div class="row">
+        <input id="projName" placeholder="Project (e.g. AI melanoma audit / CRISPR derm review)" />
+        <input id="projDue" type="date" />
+      </div>
+      <input id="projNext" placeholder="Next action (e.g. Extract data, draft abstract)" />
+      <button class="btn primary" id="addProject" style="margin-top:10px">Add Project</button>
+      <ul id="projList" style="margin-top:10px"></ul>
+    </section>
+
+    <!-- ANALYTICS -->
+    <section id="analytics" class="grid" style="display:none">
+      <div class="card" style="grid-column: span 6;">
+        <h2>Focus Minutes (last 7 days)</h2>
+        <p class="sub">Includes Pomodoro + logged sessions.</p>
+        <canvas id="focusChart" width="800" height="220"></canvas>
+      </div>
+      <div class="card" style="grid-column: span 6;">
+        <h2>Topics Completed (last 7 days)</h2>
+        <p class="sub">From Study Tracker entries.</p>
+        <canvas id="topicChart" width="800" height="220"></canvas>
+      </div>
+      <div class="card" style="grid-column: span 12;">
+        <h2>Quick Summary</h2>
+        <div class="kpi">
+          <span class="chip" id="sumFocus">Focus today: 0 min</span>
+          <span class="chip" id="sumTopics">Topics today: 0</span>
+          <span class="chip" id="sumSba">SBAs today: 0</span>
+        </div>
+        <p class="small" style="margin-top:10px">Everything is stored locally in your browser. Use Export/Import to sync across devices.</p>
+      </div>
+    </section>
+
+    <!-- SETTINGS -->
+    <section id="settings" class="card" style="display:none">
+      <h2>Settings</h2>
+      <p class="sub">Basic configuration for your dashboard.</p>
+      <div class="row">
+        <button class="btn" id="resetToday">Clear today only</button>
+        <button class="btn" id="resetAll">Clear all data</button>
+      </div>
+      <p class="small" style="margin-top:10px">Clearing all data removes everything stored in your browser for this site.</p>
+    </section>
+
+  </main>
+</div>
+
+<script>
+  /* ------------------------- Storage helpers ------------------------- */
+  const LS_KEY = 'msd.v1';
+  const todayISO = new Date().toISOString().slice(0,10);
+
+  function defaultState(){
+    return {
+      meta:{ theme:'light' },
+      subjects:[
+        {name:'Nephrology', color:'#2563eb'},
+        {name:'Dermatology', color:'#ec4899'},
+        {name:'Neurology', color:'#7c3aed'},
+        {name:'Psychiatry', color:'#22c55e'},
+      ],
+      exam:{ name:'', date:'' },
+      planByDate:{},
+      notesByDate:{},
+      weekly:{}, // weekKey -> {Mon:'', ...}
+      tasksByDate:{}, // date -> [{t, subject, due}]
+      topicsByDate:{}, // date -> [{t, subject}]
+      focusMinutesByDate:{}, // date -> number
+      sbaByDate:{}, // date -> [{n, subject, ts}]
+      sessionsByDate:{}, // date -> [{type, minutes, subject, note, ts}]
+      osce:{ stations:{}, order:[] }, // name -> [{text, done}]
+      projects:[] // [{name, due, next, created}]
+    };
+  }
+
+  function loadState(){
+    try{
+      const raw = localStorage.getItem(LS_KEY);
+      if(!raw) return defaultState();
+      const s = JSON.parse(raw);
+      return {...defaultState(), ...s};
+    }catch{ return defaultState(); }
+  }
+
+  let state = loadState();
+
+  function saveState(){
+    localStorage.setItem(LS_KEY, JSON.stringify(state));
+  }
+
+  function ensureDateBuckets(date){
+    state.planByDate[date] ??= '';
+    state.notesByDate[date] ??= '';
+    state.tasksByDate[date] ??= [];
+    state.topicsByDate[date] ??= [];
+    state.focusMinutesByDate[date] ??= 0;
+    state.sbaByDate[date] ??= [];
+    state.sessionsByDate[date] ??= [];
+  }
+
+  ensureDateBuckets(todayISO);
+
+  /* ------------------------- Theme ------------------------- */
+  const themeBtn = document.getElementById('themeBtn');
+  function applyTheme(){
+    document.documentElement.setAttribute('data-theme', state.meta.theme === 'dark' ? 'dark' : 'light');
+    themeBtn.textContent = state.meta.theme === 'dark' ? '☀️' : '🌙';
+  }
+  themeBtn.onclick = () => {
+    state.meta.theme = state.meta.theme === 'dark' ? 'light' : 'dark';
+    saveState();
+    applyTheme();
+    drawAll();
+  };
+  applyTheme();
+
+  /* ------------------------- Navigation ------------------------- */
+  const navButtons = document.querySelectorAll('.nav button');
+  function show(view){
+    document.querySelectorAll('main > section').forEach(s => s.style.display = 'none');
+    const el = document.getElementById(view);
+    if(el) el.style.display = (view === 'overview' || view === 'analytics') ? '' : 'block';
+    navButtons.forEach(b => b.classList.toggle('active', b.dataset.view === view));
+    if(view === 'analytics') { document.getElementById('analytics').style.display = 'grid'; drawAll(); }
+    if(view === 'weekly') renderWeekly();
+    if(view === 'osce') renderOsce();
+  }
+  navButtons.forEach(b => b.onclick = () => show(b.dataset.view));
+
+  /* ------------------------- Overview: Today + Exam ------------------------- */
+  const plan = document.getElementById('plan');
+  plan.value = state.planByDate[todayISO] || '';
+  plan.oninput = () => { state.planByDate[todayISO] = plan.value; saveState(); };
+
+  const todayChip = document.getElementById('todayChip');
+  todayChip.textContent = `Today: ${todayISO}`;
+
+  const examDate = document.getElementById('examDate');
+  const examName = document.getElementById('examName');
+  examDate.value = state.exam.date || '';
+  examName.value = state.exam.name || '';
+  examDate.oninput = () => { state.exam.date = examDate.value; saveState(); updateCountdown(); };
+  examName.oninput = () => { state.exam.name = examName.value; saveState(); updateCountdown(); };
+
+  function daysBetween(a,b){
+    const A = new Date(a+'T00:00:00');
+    const B = new Date(b+'T00:00:00');
+    return Math.round((B-A)/(1000*60*60*24));
+  }
+
+  function updateCountdown(){
+    const chip = document.getElementById('countdownChip');
+    if(!state.exam.date){
+      chip.textContent = 'Set an exam date →';
+      return;
+    }
+    const d = daysBetween(todayISO, state.exam.date);
+    const name = state.exam.name?.trim() ? state.exam.name.trim()+': ' : '';
+    chip.textContent = d >= 0 ? `${name}${d} days to go` : `${name}${Math.abs(d)} days since`;
+  }
+  updateCountdown();
+
+  /* ------------------------- Subjects ------------------------- */
+  const subjectChips = document.getElementById('subjectChips');
+  const subjectName = document.getElementById('subjectName');
+  const subjectColor = document.getElementById('subjectColor');
+  const addSubject = document.getElementById('addSubject');
+
+  function subjectOptions(selectEl){
+    selectEl.innerHTML = '';
+    const opt0 = document.createElement('option');
+    opt0.value = ''; opt0.textContent = 'No subject';
+    selectEl.appendChild(opt0);
+    state.subjects.forEach(s => {
+      const o = document.createElement('option');
+      o.value = s.name; o.textContent = s.name;
+      selectEl.appendChild(o);
+    });
+  }
+
+  function renderSubjects(){
+    subjectChips.innerHTML = '';
+    state.subjects.forEach((s, idx) => {
+      const chip = document.createElement('span');
+      chip.className = 'chip';
+      chip.title = 'Click to remove';
+      chip.innerHTML = `<span class="swatch" style="background:${s.color}"></span>${escapeHtml(s.name)}`;
+      chip.onclick = () => {
+        state.subjects.splice(idx,1);
+        saveState();
+        refreshSubjectSelects();
+        renderSubjects();
+      };
+      subjectChips.appendChild(chip);
+    });
+  }
+
+  addSubject.onclick = () => {
+    const n = subjectName.value.trim();
+    if(!n) return;
+    if(state.subjects.some(s => s.name.toLowerCase() === n.toLowerCase())) return;
+    state.subjects.push({name:n, color:subjectColor.value});
+    subjectName.value='';
+    saveState();
+    refreshSubjectSelects();
+    renderSubjects();
+  };
+
+  function refreshSubjectSelects(){
+    ['quickSubject','quickStudySubject','taskSubject','studySubject','sbaSubject','ankiSubject'].forEach(id => {
+      subjectOptions(document.getElementById(id));
+    });
+  }
+
+  renderSubjects();
+  refreshSubjectSelects();
+
+  /* ------------------------- Calendar notes ------------------------- */
+  const datePicker = document.getElementById('datePicker');
+  const dayNotes = document.getElementById('dayNotes');
+  const jumpToday = document.getElementById('jumpToday');
+  datePicker.value = todayISO;
+  dayNotes.value = state.notesByDate[todayISO] || '';
+
+  function loadDay(date){
+    ensureDateBuckets(date);
+    dayNotes.value = state.notesByDate[date] || '';
+  }
+  datePicker.oninput = () => loadDay(datePicker.value);
+  dayNotes.oninput = () => { const d = datePicker.value; ensureDateBuckets(d); state.notesByDate[d] = dayNotes.value; saveState(); };
+  jumpToday.onclick = () => { datePicker.value = todayISO; loadDay(todayISO); };
+
+  /* ------------------------- Weekly planner ------------------------- */
+  const weekGrid = document.getElementById('weekGrid');
+
+  function isoWeekKey(dateISO){
+    const d = new Date(dateISO+'T00:00:00');
+    const target = new Date(d.valueOf());
+    const dayNr = (d.getUTCDay() + 6) % 7; // Mon=0
+    target.setUTCDate(target.getUTCDate() - dayNr + 3);
+    const firstThursday = new Date(Date.UTC(target.getUTCFullYear(),0,4));
+    const week = 1 + Math.round(((target - firstThursday) / 86400000 - 3) / 7);
+    const year = target.getUTCFullYear();
+    return `${year}-W${String(week).padStart(2,'0')}`;
+  }
+
+  function renderWeekly(){
+    const key = isoWeekKey(todayISO);
+    state.weekly[key] ??= {Mon:'',Tue:'',Wed:'',Thu:'',Fri:'',Sat:'',Sun:''};
+    const days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+    weekGrid.innerHTML='';
+    days.forEach(d => {
+      const box = document.createElement('div');
+      box.className = 'dayBox';
+      box.innerHTML = `<h4>${d}</h4><textarea rows="5" placeholder="Plan...">${state.weekly[key][d]||''}</textarea>`;
+      const ta = box.querySelector('textarea');
+      ta.oninput = () => { state.weekly[key][d] = ta.value; saveState(); };
+      weekGrid.appendChild(box);
+    });
+  }
+
+  /* ------------------------- Tasks ------------------------- */
+  const taskInput = document.getElementById('taskInput');
+  const taskSubject = document.getElementById('taskSubject');
+  const taskDue = document.getElementById('taskDue');
+  const taskList = document.getElementById('taskList');
+
+  function renderTasks(){
+    ensureDateBuckets(todayISO);
+    taskList.innerHTML = '';
+    state.tasksByDate[todayISO].forEach((item, i) => {
+      const subj = getSubject(item.subject);
+      const li = document.createElement('li');
+      li.innerHTML = `
+        <div class="li-left">
+          <span class="chip" title="Subject">
+            <span class="swatch" style="background:${subj?.color || '#94a3b8'}"></span>
+            ${escapeHtml(item.subject || 'No subject')}
+          </span>
+          <div class="li-title">${escapeHtml(item.t)}</div>
+        </div>
+        <div class="small">${item.due ? 'Due: '+item.due : ''}</div>
+      `;
+      li.onclick = () => { state.tasksByDate[todayISO].splice(i,1); saveState(); renderTasks(); };
+      taskList.appendChild(li);
+    });
+  }
+
+  function addTask(t, subject, due){
+    if(!t.trim()) return;
+    ensureDateBuckets(todayISO);
+    state.tasksByDate[todayISO].unshift({t:t.trim(), subject:subject||'', due:due||''});
+    saveState();
+    renderTasks();
+  }
+
+  taskInput.onkeydown = e => {
+    if(e.key === 'Enter'){
+      addTask(taskInput.value, taskSubject.value, taskDue.value);
+      taskInput.value='';
+    }
+  };
+
+  // Quick add (Overview)
+  document.getElementById('quickAddTask').onclick = () => {
+    addTask(document.getElementById('quickTask').value, document.getElementById('quickSubject').value, '');
+    document.getElementById('quickTask').value='';
+  };
+
+  renderTasks();
+
+  /* ------------------------- Study tracker ------------------------- */
+  const studyInput = document.getElementById('studyInput');
+  const studySubject = document.getElementById('studySubject');
+  const studyList = document.getElementById('studyList');
+
+  function renderStudy(){
+    ensureDateBuckets(todayISO);
+    studyList.innerHTML = '';
+    state.topicsByDate[todayISO].forEach((item, i) => {
+      const subj = getSubject(item.subject);
+      const li = document.createElement('li');
+      li.innerHTML = `
+        <div class="li-left">
+          <span class="chip"><span class="swatch" style="background:${subj?.color || '#94a3b8'}"></span>${escapeHtml(item.subject || 'No subject')}</span>
+          <div class="li-title">✓ ${escapeHtml(item.t)}</div>
+        </div>
+        <div class="small">${item.ts?.slice(11,16) || ''}</div>
+      `;
+      li.onclick = () => { state.topicsByDate[todayISO].splice(i,1); saveState(); renderStudy(); drawAll(); };
+      studyList.appendChild(li);
+    });
+  }
+
+  function addTopic(t, subject){
+    if(!t.trim()) return;
+    ensureDateBuckets(todayISO);
+    state.topicsByDate[todayISO].unshift({t:t.trim(), subject:subject||'', ts:new Date().toISOString()});
+    saveState();
+    renderStudy();
+    drawAll();
+  }
+
+  studyInput.onkeydown = e => {
+    if(e.key === 'Enter'){
+      addTopic(studyInput.value, studySubject.value);
+      studyInput.value='';
+    }
+  };
+
+  document.getElementById('quickAddStudy').onclick = () => {
+    addTopic(document.getElementById('quickStudy').value, document.getElementById('quickStudySubject').value);
+    document.getElementById('quickStudy').value='';
+  };
+
+  renderStudy();
+
+  /* ------------------------- Pomodoro (cycles + breaks) ------------------------- */
+  const timerEl = document.getElementById('timer');
+  const sessionLabel = document.getElementById('sessionLabel');
+  const cycleLabel = document.getElementById('cycleLabel');
+  const startP = document.getElementById('startP');
+  const pauseP = document.getElementById('pauseP');
+  const resetP = document.getElementById('resetP');
+  const focusMin = document.getElementById('focusMin');
+  const breakMin = document.getElementById('breakMin');
+  const longBreakMin = document.getElementById('longBreakMin');
+
+  let pInterval = null;
+  let phase = 'focus';
+  let cycle = 1;
+  let secondsLeft = 25*60;
+  let focusSecondsLoggedThisBlock = 0;
+
+  function setFromInputs(){
+    secondsLeft = parseInt(focusMin.value,10)*60;
+    phase = 'focus';
+    cycle = 1;
+    focusSecondsLoggedThisBlock = 0;
+    updateTimerUI();
+  }
+
+  function fmt(sec){
+    const m = String(Math.floor(sec/60)).padStart(2,'0');
+    const s = String(sec%60).padStart(2,'0');
+    return `${m}:${s}`;
+  }
+
+  function updateTimerUI(){
+    timerEl.textContent = fmt(secondsLeft);
+    sessionLabel.textContent = phase === 'focus' ? 'Focus' : (cycle === 4 ? 'Long break' : 'Break');
+    cycleLabel.textContent = `Cycle ${cycle}/4`;
+  }
+
+  function tick(){
+    secondsLeft--;
+    if(phase === 'focus') focusSecondsLoggedThisBlock++;
+    updateTimerUI();
+
+    if(secondsLeft <= 0){
+      // Log focus minutes at end of a focus block
+      if(phase === 'focus'){
+        const mins = Math.round(focusSecondsLoggedThisBlock/60);
+        if(mins>0){
+          ensureDateBuckets(todayISO);
+          state.focusMinutesByDate[todayISO] += mins;
+          saveState();
+        }
+        focusSecondsLoggedThisBlock = 0;
+      }
+
+      // Switch phase
+      if(phase === 'focus'){
+        phase = 'break';
+        secondsLeft = (cycle === 4 ? parseInt(longBreakMin.value,10) : parseInt(breakMin.value,10)) * 60;
+      }else{
+        phase = 'focus';
+        cycle = cycle === 4 ? 1 : cycle + 1;
+        secondsLeft = parseInt(focusMin.value,10) * 60;
+      }
+      updateTimerUI();
+      drawAll();
+    }
+  }
+
+  startP.onclick = () => {
+    if(pInterval) return;
+    pInterval = setInterval(tick, 1000);
+  };
+  pauseP.onclick = () => { if(pInterval){ clearInterval(pInterval); pInterval = null; } };
+  resetP.onclick = () => { if(pInterval){ clearInterval(pInterval); pInterval = null; } setFromInputs(); };
+  focusMin.onchange = setFromInputs;
+  breakMin.onchange = setFromInputs;
+  longBreakMin.onchange = setFromInputs;
+  setFromInputs();
+
+  /* ------------------------- OSCE Checklist ------------------------- */
+  const osceStation = document.getElementById('osceStation');
+  const createStation = document.getElementById('createStation');
+  const osceSelect = document.getElementById('osceSelect');
+  const osceItem = document.getElementById('osceItem');
+  const osceList = document.getElementById('osceList');
+
+  function refreshOsceStations(){
+    osceSelect.innerHTML = '';
+    const stations = state.osce.order;
+    if(stations.length === 0){
+      const o = document.createElement('option');
+      o.value = ''; o.textContent = 'No stations yet';
+      osceSelect.appendChild(o);
+      return;
+    }
+    stations.forEach(name => {
+      const o = document.createElement('option');
+      o.value = name; o.textContent = name;
+      osceSelect.appendChild(o);
+    });
+  }
+
+  function renderOsce(){
+    refreshOsceStations();
+    const name = osceSelect.value;
+    const items = name ? (state.osce.stations[name] || []) : [];
+    osceList.innerHTML = '';
+    items.forEach((it, i) => {
+      const li = document.createElement('li');
+      li.innerHTML = `<div class="li-left"><div class="li-title">${it.done ? '✓ ' : ''}${escapeHtml(it.text)}</div></div><div class="small">${it.done ? 'Done' : ''}</div>`;
+      li.onclick = () => { it.done = !it.done; saveState(); renderOsce(); };
+      li.ondblclick = () => { items.splice(i,1); saveState(); renderOsce(); };
+      osceList.appendChild(li);
+    });
+  }
+
+  createStation.onclick = () => {
+    const n = osceStation.value.trim();
+    if(!n) return;
+    if(state.osce.stations[n]) return;
+    state.osce.stations[n] = [];
+    state.osce.order.unshift(n);
+    osceStation.value='';
+    saveState();
+    refreshOsceStations();
+    osceSelect.value = n;
+    renderOsce();
+  };
+
+  osceSelect.onchange = renderOsce;
+
+  osceItem.onkeydown = e => {
+    if(e.key === 'Enter'){
+      const station = osceSelect.value;
+      const text = osceItem.value.trim();
+      if(!station || !text) return;
+      state.osce.stations[station].push({text, done:false});
+      osceItem.value='';
+      saveState();
+      renderOsce();
+    }
+  };
+
+  /* ------------------------- SBA Counter ------------------------- */
+  const sbaCount = document.getElementById('sbaCount');
+  const sbaSubject = document.getElementById('sbaSubject');
+  const logSba = document.getElementById('logSba');
+  const sbaLog = document.getElementById('sbaLog');
+
+  function renderSba(){
+    ensureDateBuckets(todayISO);
+    sbaLog.innerHTML='';
+    state.sbaByDate[todayISO].forEach((x,i)=>{
+      const subj = getSubject(x.subject);
+      const li = document.createElement('li');
+      li.innerHTML = `
+        <div class="li-left">
+          <span class="chip"><span class="swatch" style="background:${subj?.color || '#94a3b8'}"></span>${escapeHtml(x.subject || 'No subject')}</span>
+          <div class="li-title">${x.n} SBAs</div>
+        </div>
+        <div class="small">${x.ts.slice(11,16)}</div>
+      `;
+      li.onclick=()=>{ state.sbaByDate[todayISO].splice(i,1); saveState(); renderSba(); drawAll(); };
+      sbaLog.appendChild(li);
+    });
+
+    document.getElementById('sbaToday').textContent = `Today: ${sumSbaForDate(todayISO)}`;
+    document.getElementById('sbaWeek').textContent = `This week: ${sumSbaLastNDays(7)}`;
+  }
+
+  logSba.onclick = () => {
+    const n = parseInt(sbaCount.value,10);
+    if(!n || n < 1) return;
+    ensureDateBuckets(todayISO);
+    state.sbaByDate[todayISO].unshift({n, subject:sbaSubject.value||'', ts:new Date().toISOString()});
+    sbaCount.value='';
+    saveState();
+    renderSba();
+    drawAll();
+  };
+
+  renderSba();
+
+  /* ------------------------- Sessions (Anki / Qbank etc.) ------------------------- */
+  const logAnki = document.getElementById('logAnki');
+  const ankiType = document.getElementById('ankiType');
+  const ankiMinutes = document.getElementById('ankiMinutes');
+  const ankiSubject = document.getElementById('ankiSubject');
+  const ankiNote = document.getElementById('ankiNote');
+  const ankiLog = document.getElementById('ankiLog');
+
+  function renderSessions(){
+    ensureDateBuckets(todayISO);
+    ankiLog.innerHTML='';
+    state.sessionsByDate[todayISO].forEach((x,i)=>{
+      const subj = getSubject(x.subject);
+      const li = document.createElement('li');
+      li.innerHTML = `
+        <div class="li-left">
+          <span class="chip"><span class="swatch" style="background:${subj?.color || '#94a3b8'}"></span>${escapeHtml(x.subject || 'No subject')}</span>
+          <div class="li-title">${escapeHtml(x.type)} • ${x.minutes} min${x.note ? ' — '+escapeHtml(x.note) : ''}</div>
+        </div>
+        <div class="small">${x.ts.slice(11,16)}</div>
+      `;
+      li.onclick=()=>{ state.sessionsByDate[todayISO].splice(i,1); saveState(); renderSessions(); drawAll(); };
+      ankiLog.appendChild(li);
+    });
+  }
+
+  logAnki.onclick = () => {
+    const mins = parseInt(ankiMinutes.value,10);
+    if(!mins || mins < 1) return;
+    ensureDateBuckets(todayISO);
+    state.sessionsByDate[todayISO].unshift({type:ankiType.value, minutes:mins, subject:ankiSubject.value||'', note:ankiNote.value.trim(), ts:new Date().toISOString()});
+    state.focusMinutesByDate[todayISO] += mins; // feeds analytics
+    ankiMinutes.value='';
+    ankiNote.value='';
+    saveState();
+    renderSessions();
+    drawAll();
+  };
+
+  renderSessions();
+
+  /* ------------------------- Research / Projects ------------------------- */
+  const projName = document.getElementById('projName');
+  const projDue = document.getElementById('projDue');
+  const projNext = document.getElementById('projNext');
+  const addProject = document.getElementById('addProject');
+  const projList = document.getElementById('projList');
+
+  function renderProjects(){
+    projList.innerHTML='';
+    state.projects.forEach((p,i)=>{
+      const li = document.createElement('li');
+      li.innerHTML = `
+        <div class="li-left">
+          <div class="li-title">${escapeHtml(p.name)}${p.next ? ' — '+escapeHtml(p.next) : ''}</div>
+        </div>
+        <div class="small">${p.due ? 'Due: '+p.due : ''}</div>
+      `;
+      li.onclick=()=>{ state.projects.splice(i,1); saveState(); renderProjects(); };
+      projList.appendChild(li);
+    });
+  }
+
+  addProject.onclick = () => {
+    const name = projName.value.trim();
+    if(!name) return;
+    state.projects.unshift({name, due:projDue.value||'', next:projNext.value.trim(), created:new Date().toISOString()});
+    projName.value=''; projDue.value=''; projNext.value='';
+    saveState();
+    renderProjects();
+  };
+
+  renderProjects();
+
+  /* ------------------------- Heatmap + Analytics Charts ------------------------- */
+  function dateNDaysAgo(n){
+    const d = new Date();
+    d.setDate(d.getDate()-n);
+    return d.toISOString().slice(0,10);
+  }
+
+  function intensityForDate(date){
+    ensureDateBuckets(date);
+    const topics = (state.topicsByDate[date]||[]).length;
+    const mins = state.focusMinutesByDate[date]||0;
+    const sba = (state.sbaByDate[date]||[]).reduce((a,x)=>a+(x.n||0),0);
+    // Weighted score
+    return topics*3 + Math.min(mins,180)/15 + Math.min(sba,200)/20;
+  }
+
+  function renderHeatmap(){
+    const el = document.getElementById('heatmap');
+    el.innerHTML='';
+    const values = [];
+    for(let i=27;i>=0;i--) values.push(intensityForDate(dateNDaysAgo(i)));
+    const max = Math.max(1, ...values);
+    values.forEach((v, idx)=>{
+      const c = document.createElement('div');
+      c.className='cell';
+      const p = v/max;
+      // map to alpha of accent (simple, theme-safe)
+      c.style.background = `rgba(79,70,229,${0.08 + 0.55*p})`;
+      if(document.documentElement.getAttribute('data-theme')==='dark'){
+        c.style.background = `rgba(124,58,237,${0.10 + 0.55*p})`;
+      }
+      c.title = `${dateNDaysAgo(27-idx)} • score ${v.toFixed(1)}`;
+      el.appendChild(c);
+    });
+  }
+
+  function drawBarChart(canvasId, labels, values){
+    const c = document.getElementById(canvasId);
+    const ctx = c.getContext('2d');
+    const W = c.width, H = c.height;
+    ctx.clearRect(0,0,W,H);
+
+    // background
+    ctx.fillStyle = 'rgba(0,0,0,0)';
+    ctx.fillRect(0,0,W,H);
+
+    const max = Math.max(1, ...values);
+    const pad = 30;
+    const bw = (W - pad*2) / values.length;
+
+    // axes
+    ctx.strokeStyle = 'rgba(148,163,184,0.6)';
+    ctx.beginPath();
+    ctx.moveTo(pad, H-pad);
+    ctx.lineTo(W-pad, H-pad);
+    ctx.stroke();
+
+    // bars
+    for(let i=0;i<values.length;i++){
+      const v = values[i];
+      const h = (H - pad*2) * (v/max);
+      const x = pad + i*bw + 8;
+      const y = (H - pad) - h;
+      const w = bw - 16;
+
+      ctx.fillStyle = (document.documentElement.getAttribute('data-theme')==='dark')
+        ? 'rgba(124,58,237,0.85)'
+        : 'rgba(79,70,229,0.85)';
+      ctx.fillRect(x,y,w,h);
+
+      // labels (tiny)
+      ctx.fillStyle = (document.documentElement.getAttribute('data-theme')==='dark')
+        ? 'rgba(229,231,235,0.8)'
+        : 'rgba(17,24,39,0.7)';
+      ctx.font = '12px Inter, system-ui, sans-serif';
+      ctx.fillText(labels[i], x, H - 10);
+    }
+  }
+
+  function lastNDaysLabels(n){
+    const out=[];
+    for(let i=n-1;i>=0;i--){
+      const d = new Date(); d.setDate(d.getDate()-i);
+      out.push(d.toLocaleDateString(undefined,{weekday:'short'}));
+    }
+    return out;
+  }
+
+  function lastNDaysValuesFocus(n){
+    const out=[];
+    for(let i=n-1;i>=0;i--){
+      const d = dateNDaysAgo(i);
+      ensureDateBuckets(d);
+      out.push(state.focusMinutesByDate[d]||0);
+    }
+    return out;
+  }
+
+  function lastNDaysValuesTopics(n){
+    const out=[];
+    for(let i=n-1;i>=0;i--){
+      const d = dateNDaysAgo(i);
+      ensureDateBuckets(d);
+      out.push((state.topicsByDate[d]||[]).length);
+    }
+    return out;
+  }
+
+  function sumSbaForDate(date){
+    ensureDateBuckets(date);
+    return (state.sbaByDate[date]||[]).reduce((a,x)=>a+(x.n||0),0);
+  }
+  function sumSbaLastNDays(n){
+    let total=0;
+    for(let i=0;i<n;i++) total += sumSbaForDate(dateNDaysAgo(i));
+    return total;
+  }
+
+  function updateSummary(){
+    ensureDateBuckets(todayISO);
+    document.getElementById('sumFocus').textContent = `Focus today: ${state.focusMinutesByDate[todayISO]||0} min`;
+    document.getElementById('sumTopics').textContent = `Topics today: ${(state.topicsByDate[todayISO]||[]).length}`;
+    document.getElementById('sumSba').textContent = `SBAs today: ${sumSbaForDate(todayISO)}`;
+  }
+
+  function drawAll(){
+    renderHeatmap();
+    updateSummary();
+    drawBarChart('focusChart', lastNDaysLabels(7), lastNDaysValuesFocus(7));
+    drawBarChart('topicChart', lastNDaysLabels(7), lastNDaysValuesTopics(7));
+  }
+
+  /* ------------------------- Export / Import (DIY Cloud Sync) ------------------------- */
+  document.getElementById('exportBtn').onclick = () => {
+    const data = JSON.stringify(state, null, 2);
+    const blob = new Blob([data], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'medical-study-dashboard-backup.json';
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  document.getElementById('importBtn').onclick = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'application/json';
+    input.onchange = () => {
+      const file = input.files[0];
+      if(!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try{
+          const imported = JSON.parse(reader.result);
+          state = {...defaultState(), ...imported};
+          saveState();
+          location.reload();
+        }catch{ alert('Import failed. Please choose a valid backup JSON.'); }
+      };
+      reader.readAsText(file);
+    };
+    input.click();
+  };
+
+  /* ------------------------- Settings resets ------------------------- */
+  document.getElementById('resetToday').onclick = () => {
+    if(!confirm('Clear today only?')) return;
+    delete state.planByDate[todayISO];
+    delete state.notesByDate[todayISO];
+    delete state.tasksByDate[todayISO];
+    delete state.topicsByDate[todayISO];
+    delete state.focusMinutesByDate[todayISO];
+    delete state.sbaByDate[todayISO];
+    delete state.sessionsByDate[todayISO];
+    ensureDateBuckets(todayISO);
+    saveState();
+    location.reload();
+  };
+
+  document.getElementById('resetAll').onclick = () => {
+    if(!confirm('This will delete ALL saved data for this site. Continue?')) return;
+    localStorage.removeItem(LS_KEY);
+    location.reload();
+  };
+
+  /* ------------------------- Utilities ------------------------- */
+  function getSubject(name){
+    if(!name) return null;
+    return state.subjects.find(s => s.name === name) || null;
+  }
+
+  function escapeHtml(str){
+    return String(str)
+      .replaceAll('&','&amp;')
+      .replaceAll('<','&lt;')
+      .replaceAll('>','&gt;')
+      .replaceAll('"','&quot;')
+      .replaceAll("'",'&#039;');
+  }
+
+  // Initial draw
+  drawAll();
+
+  // Ensure overview quick selects are populated
+  document.getElementById('quickSubject').value = '';
+  document.getElementById('quickStudySubject').value = '';
+
+  // Default view
+  show('overview');
+
+</script>
+</body>
+</html>
