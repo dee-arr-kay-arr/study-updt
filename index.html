@@ -6,28 +6,34 @@
   <title>Medical Study Dashboard</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
-    :root{
-      --bg:#f4f6fb;
-      --panel:#ffffff;
-      --text:#111827;
-      --muted:#6b7280;
-      --border:#e5e7eb;
-      --accent:#4f46e5;
-      --accent2:#22c55e;
-      --shadow:0 1px 4px rgba(0,0,0,.05);
-      --chip:#eef2ff;
-    }
-    [data-theme="dark"]{
-      --bg:#0b1220;
-      --panel:#0f172a;
-      --text:#e5e7eb;
-      --muted:#9ca3af;
-      --border:#1f2937;
-      --accent:#7c3aed;
-      --accent2:#22c55e;
-      --shadow:0 1px 10px rgba(0,0,0,.35);
-      --chip:#1e293b;
-    }
+   :root{
+  --bg:#070a12;
+  --panel:rgba(14, 18, 34, 0.78);
+  --text:#e7f0ff;
+  --muted:#93a4c7;
+  --border:rgba(120, 160, 255, 0.18);
+  --accent:#7c3aed;       /* neon purple */
+  --accent2:#22c55e;      /* neon green */
+  --accent3:#06b6d4;      /* neon cyan */
+  --shadow:0 10px 30px rgba(0,0,0,.55);
+  --chip:rgba(124,58,237,0.14);
+  --glow:0 0 18px rgba(124,58,237,.35), 0 0 45px rgba(6,182,212,.12);
+}
+
+/* Game mode (forced) */
+[data-theme="dark"]{
+  --bg:#070a12;
+  --panel:rgba(14, 18, 34, 0.78);
+  --text:#e7f0ff;
+  --muted:#93a4c7;
+  --border:rgba(120, 160, 255, 0.18);
+  --accent:#7c3aed;
+  --accent2:#22c55e;
+  --accent3:#06b6d4;
+  --shadow:0 10px 30px rgba(0,0,0,.55);
+  --chip:rgba(124,58,237,0.14);
+  --glow:0 0 18px rgba(124,58,237,.35), 0 0 45px rgba(6,182,212,.12);
+}
     *{box-sizing:border-box}
     body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--text)}
 
