@@ -324,7 +324,64 @@
       100%{ box-shadow: var(--shadow), var(--glow2); }
     }
     .card{ animation: breathe 3.2s ease-in-out infinite alternate; }
+/* Streak badge levels */
+.badge{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:8px 12px;border-radius:999px;
+  border:1px solid rgba(120,160,255,0.20);
+  background: rgba(124,58,237,0.10);
+  font-size:14px;font-weight:700;
+}
+.badge .gem{width:10px;height:10px;border-radius:999px}
+.b-none .gem{background:#94a3b8;}
+.b-bronze .gem{background:#fb923c;}
+.b-silver .gem{background:#e5e7eb;}
+.b-gold .gem{background:#facc15;}
+.b-diamond .gem{background:#06b6d4;}
+.badge strong{letter-spacing:.7px}
 
+/* XP bar */
+.xpbarWrap{margin-top:10px}
+.xpbar{
+  height: 12px;border-radius:999px;
+  background: rgba(120,160,255,0.10);
+  border: 1px solid rgba(120,160,255,0.18);
+  overflow:hidden;
+}
+.xpfill{
+  height:100%;
+  background: linear-gradient(90deg, rgba(34,197,94,0.85), rgba(6,182,212,0.75), rgba(124,58,237,0.75));
+  width:0%;
+}
+.xpmeta{display:flex;justify-content:space-between;font-size:14px;color:var(--muted);margin-bottom:8px}
+
+/* Mission row + tick animation */
+.mission{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:10px 10px;border-radius:14px;
+  border:1px solid rgba(120,160,255,0.14);
+  background: rgba(3,6,14,0.18);
+  margin-top:8px;
+}
+.mission .left{display:flex;gap:10px;align-items:center;min-width:0}
+.mission .m-ico{width:18px;height:18px;display:inline-grid;place-items:center;opacity:.95}
+.mission .m-text{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mission.done{border-color: rgba(34,197,94,0.22); background: rgba(34,197,94,0.06)}
+
+.tick{
+  display:inline-grid;place-items:center;
+  width:22px;height:22px;border-radius:999px;
+  border:1px solid rgba(120,160,255,0.12);
+  opacity:0; transform: scale(.85);
+}
+.mission.done .tick{
+  opacity:1;
+  border-color: rgba(34,197,94,0.30);
+  background: rgba(34,197,94,0.08);
+  animation: tickPop .18s ease-out, tickGlow 1.1s ease-out;
+}
+@keyframes tickPop{from{transform: scale(.7);}to{transform: scale(1);}}
+@keyframes tickGlow{40%{box-shadow:0 0 18px rgba(34,197,94,.25);}}
     /* Mobile */
     @media (max-width: 980px){
       body{font-size: 17px;}
