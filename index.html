@@ -894,7 +894,7 @@
         </div>
         <div class="small">${item.due ? 'Due: '+item.due : ''}</div>
       `;
-      li.onclick = () => { state.tasksByDate[todayISO].splice(i,1); saveState(); renderTasks(); };
+      li.onclick = () => { state.tasksByDate[todayISO].splice(i,1); saveState(); renderTasks();addXP(6);};
       taskList.appendChild(li);
     });
   }
@@ -949,6 +949,8 @@
     saveState();
     renderStudy();
     drawAll();
+    addXP(12);
+
   }
 
   studyInput.onkeydown = e => {
@@ -1139,6 +1141,7 @@
     saveState();
     renderSba();
     drawAll();
+    addXP(Math.min(20, Math.round(n/2)));
   };
   renderSba();
 
