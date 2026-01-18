@@ -1310,12 +1310,134 @@
     document.getElementById('sumSba').textContent = `SBAs today: ${sumSbaForDate(todayISO)}`;
   }
 
-  function drawAll(){
-    renderHeatmap();
-    updateSummary();
-    drawBarChart('focusChart', lastNDaysLabels(7), lastNDaysValuesFocus(7));
-    drawBarChart('topicChart', lastNDaysLabels(7), lastNDaysValuesTopics(7));
+ function drawAll(){
+  renderHeatmap();
+  updateSummary();
+  drawBarChart('focusChart', lastNDaysLabels(7), lastNDaysValuesFocus(7));
+  drawBarChart('topicChart', lastNDaysLabels(7), lastNDaysValuesTopics(7));
+  updateXPUI();
+  updateStreakUI();
+  drawMissions();
+}
+  /* ------------------------- XP system ------------------------- */
+function getXP(){
+  const k = 'msd.xp.'+todayISO;
+  return parseInt(localStorage.getItem(k)||'0',10);
+}
+function setXP(v){
+  const k = 'msd.xp.'+todayISO;
+  localStorage.setItem(k, String(Math.max(0, v)));
+}
+function addXP(delta){
+  if(!delta) return;
+  setXP(getXP() + delta);
+  updateXPUI();
+}
+function updateXPUI(){
+  const elFill = document.getElementById('xpFill');
+  const elLabel = document.getElementById('xpLabel');
+  const elRight = document.getElementById('xpRight');
+  if(!elFill || !elLabel || !elRight) return;
+
+  const xp = getXP();
+  const cap = 100;
+  const pct = Math.min(100, Math.round((xp % cap) / cap * 100));
+  const level = Math.floor(xp / cap) + 1;
+  elLabel.textContent = `Level ${level}`;
+  elRight.textContent = `${xp % cap} / ${cap}`;
+  elFill.style.width = pct + '%';
+}
+
+/* ------------------------- Streak system + badge levels ------------------------- */
+function streakBadge(streak){
+  if(streak >= 30) return {cls:'b-diamond', name:'DIAMOND'};
+  if(streak >= 14) return {cls:'b-gold', name:'GOLD'};
+  if(streak >= 7)  return {cls:'b-silver', name:'SILVER'};
+  if(streak >= 3)  return {cls:'b-bronze', name:'BRONZE'};
+  return {cls:'b-none', name:'NONE'};
+}
+
+function dayComplete(date){
+  ensureDateBuckets(date);
+  const topics = (state.topicsByDate[date]||[]).length;
+  const focus  = state.focusMinutesByDate[date]||0;
+  const sba    = sumSbaForDate(date);
+  let ok = 0;
+  if(topics >= 1) ok++;
+  if(focus >= 20) ok++;
+  if(sba >= 10) ok++;
+  return ok >= 2;
+}
+
+function computeStreak(){
+  let streak = 0;
+  for(let i=0;i<365;i++){
+    const d = dateNDaysAgo(i);
+    if(dayComplete(d)) streak++;
+    else break;
   }
+  return streak;
+}
+
+function updateStreakUI(){
+  const el = document.getElementById('streakChip');
+  if(!el) return;
+  const s = computeStreak();
+  const b = streakBadge(s);
+  el.className = `badge ${b.cls}`;
+  el.innerHTML = `<span class="gem"></span>Streak: ${s} <strong>${b.name}</strong>`;
+}
+
+/* ------------------------- Daily missions (with tick animation) ------------------------- */
+function missionStatus(){
+  ensureDateBuckets(todayISO);
+  const topics = (state.topicsByDate[todayISO]||[]).length;
+  const focus  = state.focusMinutesByDate[todayISO]||0;
+  const sba    = sumSbaForDate(todayISO);
+  return {
+    topic: {done: topics >= 1, text:`Log 1 topic (${Math.min(1,topics)}/1)`},
+    focus: {done: focus >= 20, text:`Focus 20 min (${Math.min(20,focus)}/20)`},
+    sba:   {done: sba >= 10,   text:`Do 10 SBAs (${Math.min(10,sba)}/10)`}
+  };
+}
+
+function drawMissions(){
+  const container = document.getElementById('missions');
+  const chip = document.getElementById('missionChip');
+  if(!container || !chip) return;
+
+  const m = missionStatus();
+  container.innerHTML = '';
+
+  const missions = [
+    {ico:'✦', label:m.topic.text, done:m.topic.done},
+    {ico:'⏱', label:m.focus.text, done:m.focus.done},
+    {ico:'▦', label:m.sba.text, done:m.sba.done},
+  ];
+
+  let doneCount = 0;
+
+  missions.forEach(x=>{
+    if(x.done) doneCount++;
+    const el = document.createElement('div');
+    el.className = 'mission' + (x.done ? ' done' : '');
+    el.innerHTML = `
+      <div class="left">
+        <span class="m-ico">${x.ico}</span>
+        <div class="m-text">${escapeHtml(x.label)}</div>
+      </div>
+      <span class="tick">✓</span>
+    `;
+    container.appendChild(el);
+  });
+
+  chip.textContent = `Missions: ${doneCount}/3`;
+
+  if(doneCount === 3 && localStorage.getItem('msd.mission.done.'+todayISO) !== '1'){
+    localStorage.setItem('msd.mission.done.'+todayISO, '1');
+    addXP(20);
+  }
+}
 
   /* ------------------------- Export / Import ------------------------- */
   document.getElementById('exportBtn').onclick = () => {
