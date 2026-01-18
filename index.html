@@ -108,6 +108,148 @@
       aside{position:relative;top:0;height:auto;border-right:none;border-bottom:1px solid var(--border)}
       main{padding:12px}
     }
+    /* ===== Game / HUD Look ===== */
+
+body{
+  background:
+    radial-gradient(1200px 800px at 20% 10%, rgba(124,58,237,.18), transparent 55%),
+    radial-gradient(900px 600px at 80% 30%, rgba(6,182,212,.14), transparent 55%),
+    radial-gradient(1200px 900px at 40% 90%, rgba(34,197,94,.10), transparent 60%),
+    linear-gradient(180deg, #050712, #070a12 55%, #050712);
+}
+
+/* subtle scanlines + noise overlay */
+body:before{
+  content:'';
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      rgba(255,255,255,0.03),
+      rgba(255,255,255,0.03) 1px,
+      transparent 1px,
+      transparent 3px
+    );
+  opacity:.10;
+  mix-blend-mode:overlay;
+  z-index:999;
+}
+body:after{
+  content:'';
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  background-image:
+    radial-gradient(rgba(255,255,255,0.08) 1px, transparent 1px);
+  background-size: 3px 3px;
+  opacity:.05;
+  z-index:998;
+}
+
+/* header = neon HUD bar */
+header{
+  background: rgba(10, 14, 28, 0.78);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border);
+  box-shadow: var(--glow);
+}
+
+/* left nav feels like a game menu */
+aside{
+  background: rgba(10, 14, 28, 0.60);
+  backdrop-filter: blur(12px);
+}
+.nav button{
+  background: rgba(124,58,237,0.10);
+  border: 1px solid rgba(124,58,237,0.18);
+  box-shadow: 0 0 0 rgba(0,0,0,0);
+  transition: transform .12s ease, box-shadow .12s ease, background .12s ease;
+}
+.nav button:hover{
+  transform: translateY(-1px);
+  box-shadow: 0 0 18px rgba(124,58,237,.22);
+  background: rgba(6,182,212,0.10);
+}
+.nav button.active{
+  background: linear-gradient(90deg, rgba(124,58,237,0.24), rgba(6,182,212,0.18));
+  border-color: rgba(6,182,212,0.28);
+  box-shadow: var(--glow);
+}
+
+/* cards become glassy panels */
+.card{
+  background: var(--panel);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(12px);
+  box-shadow: var(--shadow);
+  position: relative;
+  overflow: hidden;
+}
+.card:before{
+  content:'';
+  position:absolute;
+  inset:-2px;
+  border-radius: 18px;
+  padding: 1px;
+  background: linear-gradient(120deg, rgba(124,58,237,.45), rgba(6,182,212,.25), rgba(34,197,94,.18));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: .45;
+  pointer-events:none;
+}
+
+/* inputs become futuristic */
+input, textarea, select{
+  background: rgba(3,6,14,0.35);
+  border: 1px solid rgba(120,160,255,0.22);
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.15);
+}
+input:focus, textarea:focus, select:focus{
+  outline: none;
+  border-color: rgba(6,182,212,0.55);
+  box-shadow: 0 0 0 3px rgba(6,182,212,0.12), 0 0 18px rgba(124,58,237,.20);
+}
+
+/* buttons = neon game buttons */
+.btn{
+  background: rgba(3,6,14,0.35);
+  border: 1px solid rgba(120,160,255,0.22);
+}
+.btn.primary{
+  background: linear-gradient(90deg, rgba(124,58,237,0.9), rgba(6,182,212,0.65));
+  border-color: rgba(6,182,212,0.35);
+  box-shadow: var(--glow);
+}
+.btn.primary:hover{
+  filter: brightness(1.05);
+}
+
+/* chips feel like status badges */
+.chip{
+  background: rgba(124,58,237,0.14);
+  border: 1px solid rgba(124,58,237,0.20);
+}
+
+/* list items hover like selectable game items */
+li{
+  border-bottom: 1px solid rgba(120,160,255,0.10);
+}
+li:hover{
+  background: rgba(6,182,212,0.07);
+  box-shadow: inset 0 0 0 1px rgba(6,182,212,0.12);
+  border-radius: 12px;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+/* charts border + glow */
+canvas{
+  border: 1px solid rgba(120,160,255,0.18);
+  box-shadow: 0 0 20px rgba(6,182,212,0.10);
+}
   </style>
 </head>
 <body>
